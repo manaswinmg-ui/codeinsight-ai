@@ -62,6 +62,11 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# SQLite databases (local dev)
+*.db
+*.sqlite
+*.sqlite3
+
 # Sphinx documentation
 docs/_build/
 
