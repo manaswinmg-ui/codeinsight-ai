@@ -17,11 +17,18 @@ Does NOT contain:
 import logging
 
 from fastapi import BackgroundTasks
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import SessionLocal
 from app.models.enums import ReviewStatus
-from app.schemas.review import FindingResponse, ReviewDetailResponse, ReviewResponse
+from app.models.ticket import Ticket
+from app.schemas.review import (
+    FindingResponse,
+    ReviewDetailResponse,
+    ReviewListItemResponse,
+    ReviewResponse,
+)
 from app.services.review_processing_service import (
     ReviewProcessingService,
     review_processing_service,
@@ -84,7 +91,26 @@ class ReviewApplicationService:
         )
 
     # ─────────────────────────────────────────────────────────────────────────
-    # Use Case 2: Get review detail with findings and computed metrics
+    # Use Case 2: List all past reviews (history sidebar)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    async def list_reviews(
+        self, db: AsyncSession
+    ) -> list[ReviewListItemResponse]:
+        """Return a lightweight list of all reviews, ordered newest first."""
+        reviews = await self._review_svc.list_reviews(db)
+        return [
+            ReviewListItemResponse(
+                id=r.id,
+                language=r.language,
+                status=r.status,
+                created_at=r.created_at,
+            )
+            for r in reviews
+        ]
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Use Case 3: Get review detail with findings and computed metrics
     # ─────────────────────────────────────────────────────────────────────────
 
     async def get_review_detail(
@@ -109,6 +135,18 @@ class ReviewApplicationService:
             return None
 
         findings = review.findings or []
+        finding_ids = [f.id for f in findings]
+
+        # Batch query associated tickets to prevent N+1 lazy loading issues
+        ticket_map = {}
+        if finding_ids:
+            result = await db.execute(
+                select(Ticket.id, Ticket.finding_id).filter(
+                    Ticket.finding_id.in_(finding_ids)
+                )
+            )
+            for ticket_id, finding_id in result.all():
+                ticket_map[finding_id] = ticket_id
 
         # ── Quality score: severity-weighted deduction ──────────────────────
         _deductions = {"critical": 20, "high": 15, "medium": 10, "low": 5, "info": 2}
@@ -157,6 +195,9 @@ class ReviewApplicationService:
                     improved_code=getattr(f, "improved_code", None),
                     estimated_fix_time=getattr(f, "estimated_fix_time", None),
                     references=getattr(f, "references", None),
+                    line_start=getattr(f, "line_start", None),
+                    line_end=getattr(f, "line_end", None),
+                    ticket_id=ticket_map.get(f.id),
                 )
                 for f in findings
             ],

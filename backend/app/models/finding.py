@@ -11,6 +11,7 @@ from app.models.enums import FindingCategory, FindingStatus
 
 if TYPE_CHECKING:
     from app.models.review import Review
+    from app.models.ticket import Ticket
 
 
 class Finding(Base):
@@ -38,7 +39,15 @@ class Finding(Base):
     improved_code: Mapped[str | None] = mapped_column(Text, nullable=True)
     estimated_fix_time: Mapped[str | None] = mapped_column(String(100), nullable=True)
     references: Mapped[list | None] = mapped_column(sa.JSON, nullable=True)
+    line_start: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    line_end: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Relationships
     review: Mapped[Review] = relationship("Review", back_populates="findings")
+    ticket: Mapped[Ticket | None] = relationship(
+        "Ticket",
+        back_populates="finding",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
 

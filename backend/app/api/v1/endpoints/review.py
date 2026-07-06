@@ -8,7 +8,12 @@ from app.application.review_application_service import (
     review_application_service,
 )
 from app.db import get_db
-from app.schemas.review import ReviewCreate, ReviewDetailResponse, ReviewResponse
+from app.schemas.review import (
+    ReviewCreate,
+    ReviewDetailResponse,
+    ReviewListItemResponse,
+    ReviewResponse,
+)
 
 router = APIRouter()
 logger = logging.getLogger("app.api.review")
@@ -49,6 +54,21 @@ async def create_review(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
         ) from err
+
+
+@router.get(
+    "",
+    response_model=list[ReviewListItemResponse],
+    summary="List all past code reviews",
+)
+async def list_reviews(
+    db: AsyncSession = Depends(get_db),
+    app_service: ReviewApplicationService = Depends(
+        lambda: review_application_service
+    ),
+) -> list[ReviewListItemResponse]:
+    """Return a list of all reviews for the history sidebar."""
+    return await app_service.list_reviews(db)
 
 
 @router.get(

@@ -1,15 +1,17 @@
 import { ReviewWorkspace } from './pages/ReviewWorkspace';
+import { ToastProvider } from './components/ToastProvider';
 
 function App() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px',
-        minHeight: '90vh',
-      }}
-    >
+    <ToastProvider>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '32px',
+          minHeight: '90vh',
+        }}
+      >
       {/* App Global Header */}
       <header
         style={{
@@ -63,6 +65,7 @@ function App() {
         Engineering Workflows
       </footer>
     </div>
+    </ToastProvider>
   );
 }
 

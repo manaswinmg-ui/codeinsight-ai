@@ -31,6 +31,8 @@ class FindingMapper:
                 improved_code=getattr(dto, "improved_code", None),
                 estimated_fix_time=getattr(dto, "estimated_fix_time", None),
                 references=getattr(dto, "references", None),
+                line_start=getattr(dto, "line_start", None),
+                line_end=getattr(dto, "line_end", None),
             )
             entities.append(finding_entity)
         return entities

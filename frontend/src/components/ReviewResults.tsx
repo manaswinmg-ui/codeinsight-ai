@@ -1,9 +1,15 @@
+import * as React from 'react';
 import { useState } from 'react';
 import { ReviewDetail } from '../pages/ReviewWorkspace';
+import { CreateTicketButton } from './CreateTicketButton';
+import { TicketCard, TicketData } from './TicketCard';
+import { QualityGauge } from './QualityGauge';
+import { SeverityChart } from './SeverityChart';
 
 interface ReviewResultsProps {
   status: 'idle' | 'processing' | 'success' | 'error';
   reviewData: ReviewDetail | null;
+  setReviewData?: React.Dispatch<React.SetStateAction<ReviewDetail | null>>;
 }
 
 const SEVERITY_STYLES: Record<string, { color: string; bg: string; border: string; label: string }> = {
@@ -15,15 +21,15 @@ const SEVERITY_STYLES: Record<string, { color: string; bg: string; border: strin
 };
 
 const CATEGORY_META: Record<string, { icon: string; color: string }> = {
-  BUG:             { icon: '??', color: '#f87171' },
-  SECURITY:        { icon: '??', color: '#e879f9' },
-  PERFORMANCE:     { icon: '?', color: '#fbbf24' },
-  MAINTAINABILITY: { icon: '??', color: '#60a5fa' },
-  READABILITY:     { icon: '??', color: '#34d399' },
-  RELIABILITY:     { icon: '???', color: '#a78bfa' },
-  BEST_PRACTICE:   { icon: '?', color: '#6ee7b7' },
-  DOCUMENTATION:   { icon: '??', color: '#93c5fd' },
-  UNKNOWN:         { icon: '?', color: '#9ca3af' },
+  BUG:             { icon: '🐛', color: '#f87171' },
+  SECURITY:        { icon: '🔒', color: '#e879f9' },
+  PERFORMANCE:     { icon: '⚡', color: '#fbbf24' },
+  MAINTAINABILITY: { icon: '🔧', color: '#60a5fa' },
+  READABILITY:     { icon: '📖', color: '#34d399' },
+  RELIABILITY:     { icon: '🛡️', color: '#a78bfa' },
+  BEST_PRACTICE:   { icon: '✅', color: '#6ee7b7' },
+  DOCUMENTATION:   { icon: '📝', color: '#93c5fd' },
+  UNKNOWN:         { icon: '❓', color: '#9ca3af' },
 };
 
 const getSeverityStyles = (severity: string) =>
@@ -35,7 +41,7 @@ const getCategoryMeta = (category?: string | null) =>
 const getQualityFeedback = (score: number) => {
   if (score >= 90) return { text: 'Excellent Code Quality', color: 'var(--success-color)' };
   if (score >= 70) return { text: 'Good, but has room for improvement', color: 'var(--warning-color)' };
-  if (score >= 50) return { text: 'Moderate � needs attention', color: '#fbbf24' };
+  if (score >= 50) return { text: 'Moderate — needs attention', color: '#fbbf24' };
   return { text: 'Needs significant attention', color: 'var(--danger-color)' };
 };
 
@@ -64,8 +70,12 @@ const ConfidenceMeter = ({ value }: { value: number }) => {
   );
 };
 
-export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
+export const ReviewResults = ({ status, reviewData, setReviewData }: ReviewResultsProps) => {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [activeTicket, setActiveTicket] = useState<TicketData | null>(null);
+  const [fetchingTicketId, setFetchingTicketId] = useState<number | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   if (status !== 'success' || !reviewData) return null;
 
   const formattedDate = new Date(reviewData.created_at).toLocaleString();
@@ -79,8 +89,74 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
     });
   };
 
+  const handleTicketCreated = (findingId: number, ticketId: number) => {
+    if (setReviewData) {
+      setReviewData((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          findings: prev.findings.map((f) =>
+            f.id === findingId ? { ...f, ticket_id: ticketId } : f
+          ),
+        };
+      });
+    }
+  };
+
+  const handleViewTicket = async (ticketId: number) => {
+    setFetchingTicketId(ticketId);
+    setFetchError(null);
+    try {
+      const baseUrl = window.location.origin.includes('5173')
+        ? 'http://localhost:8000'
+        : '';
+      const response = await fetch(`${baseUrl}/api/v1/tickets/${ticketId}`);
+      if (!response.ok) {
+        throw new Error('Failed to retrieve ticket details');
+      }
+      const ticket = await response.json();
+      setActiveTicket(ticket);
+    } catch (err) {
+      setFetchError(err instanceof Error ? err.message : 'Error fetching ticket');
+    } finally {
+      setFetchingTicketId(null);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Ticket Details Panel Modal */}
+      {activeTicket && (
+        <>
+          <div
+            onClick={() => setActiveTicket(null)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 999,
+            }}
+          />
+          <TicketCard
+            ticket={activeTicket}
+            onClose={() => setActiveTicket(null)}
+            onStatusUpdated={(updated) => {
+              setActiveTicket(updated);
+            }}
+          />
+        </>
+      )}
+
+      {fetchError && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger-color)', padding: '12px', borderRadius: '8px', fontSize: '0.85rem', color: '#f87171' }}>
+          {fetchError}
+        </div>
+      )}
+
       <div className="glass-card" style={{ borderLeft: '4px solid var(--success-color)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -94,17 +170,16 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px' }}>
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '24px', borderLeft: `4px solid ${feedback.color}` }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '1px', marginBottom: '8px' }}>QUALITY SCORE</span>
-          <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>
-            {reviewData.quality_score}<span style={{ fontSize: '1.2rem', color: 'var(--text-muted)', fontWeight: 500 }}>/100</span>
-          </div>
-          <div style={{ marginTop: '12px', fontSize: '0.8rem', fontWeight: 600, color: feedback.color }}>{feedback.text}</div>
+      <div className="quality-details-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '20px' }}>
+        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '16px', borderLeft: `4px solid ${feedback.color}` }}>
+          <QualityGauge score={reviewData.quality_score} />
         </div>
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
-          <SectionLabel>Summary Analysis</SectionLabel>
-          <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.65', color: 'var(--text-primary)' }}>{reviewData.summary}</p>
+        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center', padding: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <SectionLabel>Summary Analysis</SectionLabel>
+            <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.65', color: 'var(--text-primary)' }}>{reviewData.summary}</p>
+          </div>
+          <SeverityChart findings={reviewData.findings} />
         </div>
       </div>
 
@@ -115,7 +190,7 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
 
         {reviewData.findings.length === 0 ? (
           <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center', border: '1px dashed var(--success-color)', background: 'rgba(16,185,129,0.02)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>??</div>
+            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🎉</div>
             <h4 style={{ margin: '0 0 8px 0', color: 'var(--success-color)', fontSize: '1.1rem' }}>All Clear!</h4>
             <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '400px' }}>No engineering findings detected. The code adheres to standards and looks high quality.</p>
           </div>
@@ -138,9 +213,14 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
                           {cat.icon} {finding.category}
                         </span>
                       )}
+                      {finding.line_start != null && (
+                        <span style={{ fontSize: '0.69rem', fontWeight: 700, color: 'var(--accent-color)', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.4px' }}>
+                          📍 {finding.line_start === finding.line_end ? `Line ${finding.line_start}` : `Lines ${finding.line_start}–${finding.line_end}`}
+                        </span>
+                      )}
                       {finding.estimated_fix_time && (
                         <span style={{ fontSize: '0.69rem', fontWeight: 600, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', padding: '2px 7px', borderRadius: '4px' }}>
-                          ? {finding.estimated_fix_time}
+                          ⏱ {finding.estimated_fix_time}
                         </span>
                       )}
                     </div>
@@ -161,7 +241,7 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
                 <p style={{ margin: 0, fontSize: '0.88rem', lineHeight: '1.55', color: 'var(--text-secondary)' }}>{finding.description}</p>
 
                 {finding.impact && (
-                  <InfoBlock icon="??" label="Impact" color="#fbbf24">{finding.impact}</InfoBlock>
+                  <InfoBlock icon="🎯" label="Impact" color="#fbbf24">{finding.impact}</InfoBlock>
                 )}
 
                 {finding.suggested_fix && (
@@ -175,54 +255,76 @@ export const ReviewResults = ({ status, reviewData }: ReviewResultsProps) => {
 
                 {finding.improved_code && (
                   <div style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: '#34d399' }}>? IMPROVED CODE</span>
+                    <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: '#34d399' }}>✨ IMPROVED CODE</span>
                     <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '0.82rem', color: '#6ee7b7', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                       <code>{finding.improved_code}</code>
                     </pre>
                   </div>
                 )}
 
-                {hasExtras && (
-                  <div>
+                {/* Create Ticket & Action center controls */}
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
+                  <CreateTicketButton
+                    findingId={finding.id}
+                    ticketId={finding.ticket_id}
+                    onCreateSuccess={handleTicketCreated}
+                    onViewTicket={handleViewTicket}
+                  />
+
+                  {fetchingTicketId === finding.ticket_id && finding.ticket_id != null && (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Loading ticket...</span>
+                  )}
+
+                  {hasExtras && (
                     <button
                       onClick={() => toggleExpand(finding.id)}
-                      style={{ background: 'none', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '5px 12px', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.3px' }}
+                      style={{
+                        background: 'none',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.3px',
+                      }}
                     >
-                      {isExpanded ? '? Hide details' : '? Show details � why it matters, test hints & references'}
+                      {isExpanded ? '▲ Hide details' : '▼ Show details — why it matters, test hints & references'}
                     </button>
+                  )}
+                </div>
 
-                    {isExpanded && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
-                        {finding.why_it_matters && (
-                          <InfoBlock icon="??" label="Why It Matters" color="#a78bfa">{finding.why_it_matters}</InfoBlock>
-                        )}
-                        {finding.test_case_hint && (
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.14)', padding: '10px 14px', borderRadius: '8px' }}>
-                            <span style={{ fontSize: '1rem', lineHeight: '1.2' }}>??</span>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                              <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--accent-color)' }}>TEST CASE HINT</span>
-                              <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{finding.test_case_hint}</span>
-                            </div>
-                          </div>
-                        )}
-                        {finding.references && finding.references.length > 0 && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <SectionLabel>?? References</SectionLabel>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              {finding.references.map((ref, i) => {
-                                const isUrl = ref.startsWith('http://') || ref.startsWith('https://');
-                                return isUrl ? (
-                                  <a key={i} href={ref} target="_blank" rel="noopener noreferrer"
-                                    style={{ fontSize: '0.81rem', color: '#60a5fa', textDecoration: 'none', wordBreak: 'break-all' }}>
-                                    ?? {ref}
-                                  </a>
-                                ) : (
-                                  <span key={i} style={{ fontSize: '0.81rem', color: 'var(--text-muted)' }}>� {ref}</span>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
+                {isExpanded && hasExtras && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                    {finding.why_it_matters && (
+                      <InfoBlock icon="💡" label="Why It Matters" color="#a78bfa">{finding.why_it_matters}</InfoBlock>
+                    )}
+                    {finding.test_case_hint && (
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.14)', padding: '10px 14px', borderRadius: '8px' }}>
+                        <span style={{ fontSize: '1rem', lineHeight: '1.2' }}>🧪</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--accent-color)' }}>TEST CASE HINT</span>
+                          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{finding.test_case_hint}</span>
+                        </div>
+                      </div>
+                    )}
+                    {finding.references && finding.references.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <SectionLabel>📚 References</SectionLabel>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {finding.references.map((ref, i) => {
+                            const isUrl = ref.startsWith('http://') || ref.startsWith('https://');
+                            return isUrl ? (
+                              <a key={i} href={ref} target="_blank" rel="noopener noreferrer"
+                                style={{ fontSize: '0.81rem', color: '#60a5fa', textDecoration: 'none', wordBreak: 'break-all' }}>
+                                🔗 {ref}
+                              </a>
+                            ) : (
+                              <span key={i} style={{ fontSize: '0.81rem', color: 'var(--text-muted)' }}>• {ref}</span>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>

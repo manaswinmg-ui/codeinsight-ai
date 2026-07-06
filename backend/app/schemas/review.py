@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from app.models.enums import ReviewStatus
@@ -34,6 +35,9 @@ class FindingResponse(BaseModel):
     improved_code: str | None = Field(default=None, description="Improved code snippet")
     estimated_fix_time: str | None = Field(default=None, description="Estimated time to fix")
     references: list[str] | None = Field(default=None, description="Reference links or names")
+    line_start: int | None = Field(default=None, description="Start line number in source code")
+    line_end: int | None = Field(default=None, description="End line number in source code")
+    ticket_id: int | None = Field(default=None, description="Associated bug ticket ID")
 
     class Config:
         from_attributes = True
@@ -52,3 +56,15 @@ class ReviewDetailResponse(BaseModel):
     class Config:
         from_attributes = True
         populate_by_name = True
+
+
+class ReviewListItemResponse(BaseModel):
+    """Lightweight review item for history lists (no code, no findings)."""
+
+    id: int
+    language: str
+    status: ReviewStatus
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

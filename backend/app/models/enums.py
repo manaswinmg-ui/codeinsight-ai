@@ -26,3 +26,20 @@ class FindingCategory(StrEnum):
     BEST_PRACTICE = "BEST_PRACTICE"
     DOCUMENTATION = "DOCUMENTATION"
     UNKNOWN = "UNKNOWN"
+
+
+class TicketPriority(StrEnum):
+    P0 = "P0"
+    P1 = "P1"
+    P2 = "P2"
+    P3 = "P3"
+
+
+class TicketStatus(StrEnum):
+    OPEN = "OPEN"
+    TODO = "TODO"
+    IN_PROGRESS = "IN_PROGRESS"
+    IN_REVIEW = "IN_REVIEW"
+    DONE = "DONE"
+    CLOSED = "CLOSED"
+

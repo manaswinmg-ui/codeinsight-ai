@@ -54,10 +54,14 @@ class PromptBuilder:
             '      "improved_code": "Optional concise code snippet showing an improved implementation. Do not include markdown fences.",\n'
             '      "estimated_fix_time": "5 minutes",\n'
             '      "test_case_hint": "Test case description to verify the fix.",\n'
-            '      "references": ["https://owasp.org/...", "PEP 8 - Style Guide"]\n'
+            '      "references": ["https://owasp.org/...", "PEP 8 - Style Guide"],\n'
+            '      "line_start": 12,\n'
+            '      "line_end": 15\n'
             "    }\n"
             "  ]\n"
-            "}"
+            "}\n\n"
+            "IMPORTANT: For each finding, include the approximate line_start and line_end "
+            "numbers in the source code where the issue occurs. Use 1-based line numbering."
         )
 
         metadata = {

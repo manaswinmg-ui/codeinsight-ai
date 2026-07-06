@@ -33,6 +33,12 @@ class Finding(BaseModel):
     references: list[str] | None = Field(
         default=None, description="Optional list of references (OWASP, PEP, docs)"
     )
+    line_start: int | None = Field(
+        default=None, description="Starting line number of the issue in the source code"
+    )
+    line_end: int | None = Field(
+        default=None, description="Ending line number of the issue in the source code"
+    )
 
 
 class ReviewResult(BaseModel):
@@ -102,6 +108,17 @@ def _normalize_references(value: object) -> list[str] | None:
     return result if result else None
 
 
+def _normalize_line_number(value: object) -> int | None:
+    """Coerce a line number to a positive int, or None if invalid."""
+    if value is None:
+        return None
+    try:
+        n = int(value)
+        return n if n > 0 else None
+    except (ValueError, TypeError):
+        return None
+
+
 class ResponseParser:
     def parse(self, validated_response: dict) -> ReviewResult:
         """Parse validated AI response dictionary into typed ReviewResult structure."""
@@ -125,6 +142,8 @@ class ResponseParser:
                 improved_code=_normalize_str(f.get("improved_code")),
                 estimated_fix_time=_normalize_str(f.get("estimated_fix_time")),
                 references=_normalize_references(f.get("references")),
+                line_start=_normalize_line_number(f.get("line_start")),
+                line_end=_normalize_line_number(f.get("line_end")),
             )
             parsed_findings.append(finding_obj)
 

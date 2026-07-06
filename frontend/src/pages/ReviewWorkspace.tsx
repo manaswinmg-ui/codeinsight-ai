@@ -6,6 +6,7 @@ import { LanguageSelector } from '../components/LanguageSelector';
 import { ProcessingStatus } from '../components/ProcessingStatus';
 import { ReviewButton } from '../components/ReviewButton';
 import { ReviewResults } from '../components/ReviewResults';
+import { ReviewHistory } from '../components/ReviewHistory';
 
 export interface Finding {
   id: number;
@@ -23,6 +24,9 @@ export interface Finding {
   improved_code?: string | null;
   estimated_fix_time?: string | null;
   references?: string[] | null;
+  ticket_id?: number | null;
+  line_start?: number | null;
+  line_end?: number | null;
 }
 
 export interface ReviewDetail {
@@ -154,123 +158,157 @@ export const ReviewWorkspace = () => {
     }
   };
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px',
-        minHeight: '85vh',
-      }}
-    >
-      {/* Page Header */}
-      <header
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div>
-          <h1
-            style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800 }}
-            className="gradient-text"
-          >
-            Review Workspace
-          </h1>
-          <p
-            style={{
-              margin: '4px 0 0 0',
-              color: 'var(--text-secondary)',
-              fontSize: '0.9rem',
-            }}
-          >
-            Submit code files or snippets for instant AI-assisted engineering
-            reviews
-          </p>
-        </div>
-      </header>
+  const handleLoadReview = async (id: number) => {
+    setStatus('processing');
+    setCurrentStep(0);
+    setReviewData(null);
+    setError(null);
+    try {
+      const baseUrl = window.location.origin.includes('5173')
+        ? 'http://localhost:8000'
+        : '';
+      const response = await fetch(`${baseUrl}/api/v1/reviews/${id}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load review: ${response.statusText}`);
+      }
+      const data: ReviewDetail = await response.json();
+      setCode(data.code);
+      setLanguage(data.language);
+      setReviewData(data);
+      setStatus('success');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred.');
+      setStatus('error');
+    }
+  };
 
-      {/* Main Grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
-          gap: '32px',
-          alignItems: 'start',
-        }}
-      >
-        {/* Left Column: Code input workspace */}
-        <section
-          className="glass-card"
+  return (
+    <div className="workspace-container" style={{ display: 'flex', gap: '28px', minHeight: '85vh', alignItems: 'stretch' }}>
+      {/* Collapsible Left History Sidebar */}
+      <ReviewHistory
+        onSelectReview={handleLoadReview}
+        activeReviewId={activeReviewId}
+        currentLoadedId={reviewData?.id || null}
+      />
+
+      {/* Main Content Workspace */}
+      <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
+        {/* Page Header */}
+        <header
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            minHeight: '550px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <LanguageSelector
-            value={language}
-            onChange={setLanguage}
-            disabled={status === 'processing'}
-          />
-          <FileUploader
-            onCodeUpload={handleCodeUpload}
-            disabled={status === 'processing'}
-            uploadedFileName={fileName}
-            onClearFile={handleClearFile}
-          />
-          <CodeEditor
-            value={code}
-            onChange={setCode}
-            disabled={status === 'processing'}
-          />
-        </section>
-
-        {/* Right Column: Execution control & Output layout */}
-        <section
-          style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
-        >
-          <div
-            className="glass-card"
-            style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
-          >
-            <h3
+          <div>
+            <h1
+              style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800 }}
+              className="gradient-text"
+            >
+              Review Workspace
+            </h1>
+            <p
               style={{
-                margin: 0,
-                fontSize: '1.1rem',
+                margin: '4px 0 0 0',
                 color: 'var(--text-secondary)',
+                fontSize: '0.9rem',
               }}
             >
-              Execution Control
-            </h3>
-            <ReviewButton
-              onClick={handleStartReview}
-              disabled={!code.trim()}
-              loading={status === 'processing'}
+              Submit code files or snippets for instant AI-assisted engineering
+              reviews
+            </p>
+          </div>
+        </header>
+
+        {/* Main Grid */}
+        <div
+          className="workspace-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
+            gap: '32px',
+            alignItems: 'start',
+          }}
+        >
+          {/* Left Column: Code input workspace */}
+          <section
+            className="glass-card"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+              minHeight: '550px',
+              minWidth: 0,
+            }}
+          >
+            <LanguageSelector
+              value={language}
+              onChange={setLanguage}
+              disabled={status === 'processing'}
             />
-            {status === 'error' && error && (
-              <div
+            <FileUploader
+              onCodeUpload={handleCodeUpload}
+              disabled={status === 'processing'}
+              uploadedFileName={fileName}
+              onClearFile={handleClearFile}
+            />
+            <CodeEditor
+              value={code}
+              onChange={setCode}
+              disabled={status === 'processing'}
+              language={language}
+            />
+          </section>
+
+          {/* Right Column: Execution control & Output layout */}
+          <section
+            style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}
+          >
+            <div
+              className="glass-card"
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+            >
+              <h3
                 style={{
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid var(--danger-color)',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  fontSize: '0.85rem',
-                  color: '#f87171',
-                  wordBreak: 'break-word',
+                  margin: 0,
+                  fontSize: '1.1rem',
+                  color: 'var(--text-secondary)',
                 }}
               >
-                <strong>Error:</strong> {error}
-              </div>
-            )}
-          </div>
+                Execution Control
+              </h3>
+              <ReviewButton
+                onClick={handleStartReview}
+                disabled={!code.trim()}
+                loading={status === 'processing'}
+              />
+              {status === 'error' && error && (
+                <div
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid var(--danger-color)',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: '#f87171',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  <strong>Error:</strong> {error}
+                </div>
+              )}
+            </div>
 
-          <ProcessingStatus status={status} currentStep={currentStep} />
+            <ProcessingStatus status={status} currentStep={currentStep} />
 
-          <ReviewResults status={status} reviewData={reviewData} />
-        </section>
+            <ReviewResults
+              status={status}
+              reviewData={reviewData}
+              setReviewData={setReviewData}
+            />
+          </section>
+        </div>
       </div>
     </div>
   );
