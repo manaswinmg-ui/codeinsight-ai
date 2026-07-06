@@ -116,6 +116,7 @@ async def test_validate_and_update_status_success() -> None:
 
     service = TicketService(finding_repo=MagicMock(), ticket_repo=mock_ticket_repo)
     db = AsyncMock()
+    db.add = MagicMock()
 
     updated = await service.validate_and_update_status(db, 456, TicketStatus.IN_PROGRESS)
     assert updated.status == TicketStatus.IN_PROGRESS
@@ -155,6 +156,7 @@ async def test_validate_and_update_status_resolution_notes() -> None:
 
     service = TicketService(finding_repo=MagicMock(), ticket_repo=mock_ticket_repo)
     db = AsyncMock()
+    db.add = MagicMock()
 
     updated = await service.validate_and_update_status(
         db, 456, TicketStatus.DONE, resolution_notes="Fixed SQL injection using parameterized query"
