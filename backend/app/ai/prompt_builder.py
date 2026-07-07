@@ -74,4 +74,3 @@ class PromptBuilder:
             user_prompt=user_prompt,
             metadata=metadata,
         )
-

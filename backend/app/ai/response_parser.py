@@ -4,7 +4,9 @@ from pydantic import BaseModel, Field
 class Finding(BaseModel):
     title: str = Field(..., description="Short title of the finding")
     description: str = Field(..., description="Detailed description of the issue")
-    severity: str = Field(..., description="Severity level string (critical, high, medium, low, info)")
+    severity: str = Field(
+        ..., description="Severity level string (critical, high, medium, low, info)"
+    )
     suggested_fix: str | None = Field(
         default=None, description="Suggested code snippet fix"
     )
@@ -25,7 +27,8 @@ class Finding(BaseModel):
         default=None, description="Educational explanation of why this issue matters"
     )
     improved_code: str | None = Field(
-        default=None, description="Optional improved code snippet without markdown fences"
+        default=None,
+        description="Optional improved code snippet without markdown fences",
     )
     estimated_fix_time: str | None = Field(
         default=None, description="Short estimate of time to fix"
@@ -73,8 +76,15 @@ def _normalize_confidence(value: object) -> int | None:
 def _normalize_category(value: object) -> str:
     """Normalize category string to uppercase, defaulting to UNKNOWN."""
     valid = {
-        "BUG", "SECURITY", "PERFORMANCE", "MAINTAINABILITY",
-        "READABILITY", "RELIABILITY", "BEST_PRACTICE", "DOCUMENTATION", "UNKNOWN",
+        "BUG",
+        "SECURITY",
+        "PERFORMANCE",
+        "MAINTAINABILITY",
+        "READABILITY",
+        "RELIABILITY",
+        "BEST_PRACTICE",
+        "DOCUMENTATION",
+        "UNKNOWN",
     }
     if value is None:
         return "UNKNOWN"
@@ -152,4 +162,3 @@ class ResponseParser:
             quality_score=int(validated_response.get("quality_score", 0)),
             findings=parsed_findings,
         )
-

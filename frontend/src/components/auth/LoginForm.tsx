@@ -26,7 +26,10 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+    >
       {error && (
         <div
           className="auth-error"
@@ -47,7 +50,11 @@ export function LoginForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <label
           htmlFor="login-email"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
           Email Address
         </label>
@@ -77,7 +84,11 @@ export function LoginForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <label
           htmlFor="login-password"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
           Password
         </label>

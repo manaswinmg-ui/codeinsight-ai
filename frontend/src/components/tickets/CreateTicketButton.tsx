@@ -27,14 +27,17 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
       const baseUrl = window.location.origin.includes('5173')
         ? 'http://localhost:8000'
         : '';
-      const response = await fetch(`${baseUrl}/api/v1/findings/${findingId}/ticket`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${baseUrl}/api/v1/findings/${findingId}/ticket`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-       if (!response.ok) {
+      if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.detail || 'Failed to create ticket');
       }
@@ -43,7 +46,8 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
       onCreateSuccess(findingId, ticket.id);
       addToast(`Ticket #T-${ticket.id} created successfully!`, 'success');
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : 'Error creating ticket';
+      const errMsg =
+        err instanceof Error ? err.message : 'Error creating ticket';
       setError(errMsg);
       addToast(errMsg, 'error');
     } finally {
@@ -73,11 +77,13 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
           gap: '4px',
         }}
         onMouseEnter={(e) => {
-          (e.target as HTMLButtonElement).style.background = 'var(--accent-color)';
+          (e.target as HTMLButtonElement).style.background =
+            'var(--accent-color)';
           (e.target as HTMLButtonElement).style.color = '#ffffff';
         }}
         onMouseLeave={(e) => {
-          (e.target as HTMLButtonElement).style.background = 'rgba(99, 102, 241, 0.1)';
+          (e.target as HTMLButtonElement).style.background =
+            'rgba(99, 102, 241, 0.1)';
           (e.target as HTMLButtonElement).style.color = 'var(--accent-color)';
         }}
       >
@@ -87,7 +93,14 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        alignItems: 'flex-start',
+      }}
+    >
       <button
         onClick={handleCreate}
         disabled={loading}
@@ -108,13 +121,15 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
         }}
         onMouseEnter={(e) => {
           if (!loading) {
-            (e.target as HTMLButtonElement).style.borderColor = 'var(--accent-color)';
+            (e.target as HTMLButtonElement).style.borderColor =
+              'var(--accent-color)';
             (e.target as HTMLButtonElement).style.color = 'var(--accent-color)';
           }
         }}
         onMouseLeave={(e) => {
           if (!loading) {
-            (e.target as HTMLButtonElement).style.borderColor = 'var(--border-color)';
+            (e.target as HTMLButtonElement).style.borderColor =
+              'var(--border-color)';
             (e.target as HTMLButtonElement).style.color = 'var(--text-primary)';
           }
         }}
@@ -122,7 +137,13 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
         {loading ? 'Creating...' : '➕ Create Ticket'}
       </button>
       {error && (
-        <span style={{ fontSize: '0.7rem', color: 'var(--danger-color)', marginTop: '2px' }}>
+        <span
+          style={{
+            fontSize: '0.7rem',
+            color: 'var(--danger-color)',
+            marginTop: '2px',
+          }}
+        >
           {error}
         </span>
       )}

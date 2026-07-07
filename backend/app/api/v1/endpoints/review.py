@@ -40,9 +40,7 @@ async def create_review(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User | None = Depends(get_optional_current_user),
-    app_service: ReviewApplicationService = Depends(
-        lambda: review_application_service
-    ),
+    app_service: ReviewApplicationService = Depends(lambda: review_application_service),
 ) -> ReviewResponse:
     """Submit code and language to start a new review request in PENDING state."""
     try:
@@ -59,9 +57,7 @@ async def create_review(
             detail=str(val_err),
         ) from val_err
     except Exception as err:
-        logger.error(
-            "Unexpected error in review creation API: %s", err, exc_info=True
-        )
+        logger.error("Unexpected error in review creation API: %s", err, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
@@ -135,7 +131,9 @@ async def compare_reviews(
             detail=str(val_err),
         ) from val_err
     except Exception as err:
-        logger.error("Unexpected error in review comparison API: %s", err, exc_info=True)
+        logger.error(
+            "Unexpected error in review comparison API: %s", err, exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
@@ -150,9 +148,7 @@ async def compare_reviews(
 async def get_review_details(
     review_id: int,
     db: AsyncSession = Depends(get_db),
-    app_service: ReviewApplicationService = Depends(
-        lambda: review_application_service
-    ),
+    app_service: ReviewApplicationService = Depends(lambda: review_application_service),
 ) -> ReviewDetailResponse:
     """Fetch review details, metrics, and findings."""
     try:
@@ -166,9 +162,7 @@ async def get_review_details(
     except HTTPException:
         raise
     except Exception as err:
-        logger.error(
-            "Unexpected error in review retrieval API: %s", err, exc_info=True
-        )
+        logger.error("Unexpected error in review retrieval API: %s", err, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",

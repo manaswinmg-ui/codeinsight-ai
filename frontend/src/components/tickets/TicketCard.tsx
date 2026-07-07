@@ -49,10 +49,14 @@ const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   CLOSED: [],
 };
 
-export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatusUpdated }) => {
+export const TicketCard: React.FC<TicketCardProps> = ({
+  ticket,
+  onClose,
+  onStatusUpdated,
+}) => {
   const formattedDate = new Date(ticket.created_at).toLocaleString();
   const { addToast } = useToast();
-  
+
   const [currentTicket, setCurrentTicket] = useState<TicketData>(ticket);
   const [transitioningTo, setTransitioningTo] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
@@ -69,22 +73,28 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
     }
   };
 
-  const executeTransition = async (nextStatus: string, resolutionNotes: string | null) => {
+  const executeTransition = async (
+    nextStatus: string,
+    resolutionNotes: string | null
+  ) => {
     setLoading(true);
     try {
       const baseUrl = window.location.origin.includes('5173')
         ? 'http://localhost:8000'
         : '';
-      const response = await fetch(`${baseUrl}/api/v1/tickets/${currentTicket.id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: nextStatus,
-          resolution_notes: resolutionNotes,
-        }),
-      });
+      const response = await fetch(
+        `${baseUrl}/api/v1/tickets/${currentTicket.id}/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: nextStatus,
+            resolution_notes: resolutionNotes,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
@@ -99,7 +109,12 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
       addToast(`Ticket status updated to ${nextStatus}`, 'success');
       setTransitioningTo(null);
     } catch (err) {
-      addToast(err instanceof Error ? err.message : 'Error transitioning ticket status', 'error');
+      addToast(
+        err instanceof Error
+          ? err.message
+          : 'Error transitioning ticket status',
+        'error'
+      );
     } finally {
       setLoading(false);
     }
@@ -120,14 +135,28 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
         flexDirection: 'column',
         gap: '16px',
         padding: '24px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5)',
+        boxShadow:
+          '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(16px)',
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '1px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '0.7rem',
+            color: 'var(--text-muted)',
+            fontWeight: 700,
+            letterSpacing: '1px',
+          }}
+        >
           TICKET #T-{currentTicket.id}
         </span>
         <button
@@ -142,14 +171,26 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
             lineHeight: 1,
             transition: 'color 0.2s',
           }}
-          onMouseEnter={(e) => ((e.target as HTMLButtonElement).style.color = 'var(--text-primary)')}
-          onMouseLeave={(e) => ((e.target as HTMLButtonElement).style.color = 'var(--text-muted)')}
+          onMouseEnter={(e) =>
+            ((e.target as HTMLButtonElement).style.color =
+              'var(--text-primary)')
+          }
+          onMouseLeave={(e) =>
+            ((e.target as HTMLButtonElement).style.color = 'var(--text-muted)')
+          }
         >
           &times;
         </button>
       </div>
 
-      <h3 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.15rem', fontWeight: 800 }}>
+      <h3
+        style={{
+          margin: 0,
+          color: 'var(--text-primary)',
+          fontSize: '1.15rem',
+          fontWeight: 800,
+        }}
+      >
         {currentTicket.title}
       </h3>
 
@@ -185,10 +226,24 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
 
       {/* Description */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
+        <span
+          style={{
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            letterSpacing: '0.5px',
+          }}
+        >
           DESCRIPTION
         </span>
-        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: '0.85rem',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+          }}
+        >
           {currentTicket.description}
         </p>
       </div>
@@ -205,13 +260,29 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>ASSIGNEE</span>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              color: 'var(--text-muted)',
+              fontWeight: 600,
+            }}
+          >
+            ASSIGNEE
+          </span>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             👤 {currentTicket.assignee || 'Unassigned'}
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>CREATED ON</span>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              color: 'var(--text-muted)',
+              fontWeight: 600,
+            }}
+          >
+            CREATED ON
+          </span>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
             📅 {formattedDate}
           </span>
@@ -232,10 +303,24 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
             marginTop: '4px',
           }}
         >
-          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              color: 'var(--text-muted)',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+            }}
+          >
             RESOLUTION NOTES
           </span>
-          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '0.8rem',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.4,
+            }}
+          >
             {currentTicket.resolution_notes}
           </p>
         </div>
@@ -243,8 +328,23 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
 
       {/* Transition Buttons UI */}
       {allowedNext.length > 0 && !transitioningTo && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '14px' }}>
-          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.5px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            borderTop: '1px solid var(--border-color)',
+            paddingTop: '14px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: 'var(--text-muted)',
+              letterSpacing: '0.5px',
+            }}
+          >
             UPDATE TICKET STATUS
           </span>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -266,14 +366,18 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) {
-                    (e.target as HTMLButtonElement).style.borderColor = STATUS_COLORS[next];
-                    (e.target as HTMLButtonElement).style.color = STATUS_COLORS[next];
+                    (e.target as HTMLButtonElement).style.borderColor =
+                      STATUS_COLORS[next];
+                    (e.target as HTMLButtonElement).style.color =
+                      STATUS_COLORS[next];
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!loading) {
-                    (e.target as HTMLButtonElement).style.borderColor = 'var(--border-color)';
-                    (e.target as HTMLButtonElement).style.color = 'var(--text-primary)';
+                    (e.target as HTMLButtonElement).style.borderColor =
+                      'var(--border-color)';
+                    (e.target as HTMLButtonElement).style.color =
+                      'var(--text-primary)';
                   }
                 }}
               >
@@ -286,8 +390,23 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
 
       {/* Resolution Notes Form */}
       {transitioningTo && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid var(--border-color)', paddingTop: '14px' }}>
-          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: STATUS_COLORS[transitioningTo], letterSpacing: '0.5px' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            borderTop: '1px solid var(--border-color)',
+            paddingTop: '14px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: STATUS_COLORS[transitioningTo],
+              letterSpacing: '0.5px',
+            }}
+          >
             ADD NOTES FOR TRANSITIONING TO {transitioningTo}
           </span>
           <textarea
@@ -307,7 +426,9 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
               resize: 'vertical',
             }}
           />
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <div
+            style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
+          >
             <button
               onClick={() => setTransitioningTo(null)}
               disabled={loading}
@@ -320,7 +441,11 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClose, onStatu
               onClick={() => executeTransition(transitioningTo, notes)}
               disabled={loading}
               className="btn"
-              style={{ padding: '6px 14px', fontSize: '0.8rem', background: STATUS_COLORS[transitioningTo] }}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8rem',
+                background: STATUS_COLORS[transitioningTo],
+              }}
             >
               {loading ? 'Submitting...' : 'Submit'}
             </button>

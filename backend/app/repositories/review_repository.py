@@ -21,9 +21,12 @@ class ReviewRepository(BaseRepository[Review]):
         result = await db.execute(select(Review).filter(Review.id == review_id))
         return result.scalars().first()
 
-    async def get_with_findings(self, db: AsyncSession, review_id: int) -> Review | None:
+    async def get_with_findings(
+        self, db: AsyncSession, review_id: int
+    ) -> Review | None:
         """Retrieve a Review by ID, eagerly loading its findings relationship."""
         from sqlalchemy.orm import selectinload
+
         result = await db.execute(
             select(Review)
             .filter(Review.id == review_id)

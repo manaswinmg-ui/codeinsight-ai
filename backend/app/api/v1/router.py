@@ -15,5 +15,6 @@ api_router.include_router(health_router, prefix="/health", tags=["health"])
 api_router.include_router(review_router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(ticket_router)
 api_router.include_router(dashboard_router, prefix="/dashboard", tags=["dashboard"])
-api_router.include_router(repository_router, prefix="/repositories", tags=["repositories"])
-
+api_router.include_router(
+    repository_router, prefix="/repositories", tags=["repositories"]
+)

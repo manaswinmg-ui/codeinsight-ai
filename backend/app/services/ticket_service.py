@@ -37,10 +37,22 @@ class TicketNotFoundError(ValueError):
 
 # Allowed status transitions map
 ALLOWED_TRANSITIONS: dict[TicketStatus, set[TicketStatus]] = {
-    TicketStatus.OPEN: {TicketStatus.TODO, TicketStatus.IN_PROGRESS, TicketStatus.CLOSED},
+    TicketStatus.OPEN: {
+        TicketStatus.TODO,
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.CLOSED,
+    },
     TicketStatus.TODO: {TicketStatus.IN_PROGRESS, TicketStatus.CLOSED},
-    TicketStatus.IN_PROGRESS: {TicketStatus.IN_REVIEW, TicketStatus.TODO, TicketStatus.CLOSED},
-    TicketStatus.IN_REVIEW: {TicketStatus.DONE, TicketStatus.IN_PROGRESS, TicketStatus.CLOSED},
+    TicketStatus.IN_PROGRESS: {
+        TicketStatus.IN_REVIEW,
+        TicketStatus.TODO,
+        TicketStatus.CLOSED,
+    },
+    TicketStatus.IN_REVIEW: {
+        TicketStatus.DONE,
+        TicketStatus.IN_PROGRESS,
+        TicketStatus.CLOSED,
+    },
     TicketStatus.DONE: {TicketStatus.CLOSED, TicketStatus.IN_PROGRESS},
     TicketStatus.CLOSED: set(),  # Terminal state
 }
@@ -80,7 +92,10 @@ class TicketService:
         return TicketPriority.P2
 
     async def create_ticket_from_finding(
-        self, db: AsyncSession, finding_id: int, user_id: int | None = None,
+        self,
+        db: AsyncSession,
+        finding_id: int,
+        user_id: int | None = None,
     ) -> Ticket:
         """
         Domain logic to create a new ticket from an AI Finding.

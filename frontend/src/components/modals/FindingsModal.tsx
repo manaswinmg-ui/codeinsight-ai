@@ -65,7 +65,10 @@ export const FindingsModal: React.FC<FindingsModalProps> = ({
             paddingBottom: '16px',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }} className="gradient-text">
+          <h2
+            style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}
+            className="gradient-text"
+          >
             🔎 Code Review Findings — #{reviewData.id}
           </h2>
           <button
@@ -94,7 +97,14 @@ export const FindingsModal: React.FC<FindingsModalProps> = ({
         />
 
         {/* Modal Footer */}
-        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div
+          style={{
+            borderTop: '1px solid var(--border-color)',
+            paddingTop: '16px',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
           <button
             className="btn btn-secondary"
             onClick={onClose}

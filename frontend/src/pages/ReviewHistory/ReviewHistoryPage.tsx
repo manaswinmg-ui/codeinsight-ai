@@ -1,10 +1,16 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { SearchToolbar } from '../../components/history/SearchToolbar';
-import { FilterSidebar, FilterState } from '../../components/history/FilterSidebar';
+import {
+  FilterSidebar,
+  FilterState,
+} from '../../components/history/FilterSidebar';
 import { ReviewTable } from '../../components/history/ReviewTable';
 import { Pagination } from '../../components/history/Pagination';
-import { ComparisonModal, ReviewComparison } from '../../components/modals/ComparisonModal';
+import {
+  ComparisonModal,
+  ReviewComparison,
+} from '../../components/modals/ComparisonModal';
 import { ReviewSummary } from '../../components/dashboard/RecentReviewsPanel';
 
 interface ReviewHistoryPageProps {
@@ -19,7 +25,7 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  
+
   const [filters, setFilters] = useState<FilterState>({
     status: '',
     language: '',
@@ -62,7 +68,7 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
     if (filters.hasTickets !== 'all') {
       params.append('has_tickets', filters.hasTickets);
     }
-    
+
     // Quality Range
     if (filters.qualityRange) {
       const [min, max] = filters.qualityRange.split('-');
@@ -71,7 +77,9 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
     }
 
     try {
-      const response = await fetch(`${baseUrl}/api/v1/reviews?${params.toString()}`);
+      const response = await fetch(
+        `${baseUrl}/api/v1/reviews?${params.toString()}`
+      );
       if (!response.ok) throw new Error('Failed to load review history logs.');
       const data = await response.json();
       setReviews(data.items || []);
@@ -85,7 +93,7 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
 
   useEffect(() => {
     fetchReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [currentPage, search, sortBy, filters]);
 
   // Reset page to 1 when filters or search change
@@ -168,7 +176,15 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
           onReset={handleResetFilters}
         />
 
-        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0 }}>
+        <div
+          style={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            minWidth: 0,
+          }}
+        >
           <ReviewTable
             reviews={reviews}
             loading={loading}

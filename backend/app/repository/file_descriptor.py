@@ -1,6 +1,7 @@
 import hashlib
 import os
 from datetime import UTC, datetime
+
 from pydantic import BaseModel
 
 
@@ -18,9 +19,11 @@ class FileDescriptor(BaseModel):
     content: str | None = None
 
     @classmethod
-    def from_path(cls, relative_path: str, absolute_path: str, size_bytes: int) -> "FileDescriptor":
+    def from_path(
+        cls, relative_path: str, absolute_path: str, size_bytes: int
+    ) -> "FileDescriptor":
         _, ext = os.path.splitext(relative_path)
-        
+
         # Determine last modified datetime
         try:
             mtime = os.path.getmtime(absolute_path)

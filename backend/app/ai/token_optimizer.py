@@ -47,17 +47,33 @@ class TokenOptimizer:
         parts = normalized.split("/")
 
         # Excluded directories
-        excluded_dirs = {"node_modules", "vendor", "dist", "build", ".git", "venv", ".venv", "__pycache__"}
+        excluded_dirs = {
+            "node_modules",
+            "vendor",
+            "dist",
+            "build",
+            ".git",
+            "venv",
+            ".venv",
+            "__pycache__",
+        }
         if any(part in excluded_dirs for part in parts):
             return True
 
         # Lock files (unless allowed)
-        lock_files = {"package-lock.json", "yarn.lock", "poetry.lock", "cargo.lock", "pnpm-lock.yaml"}
+        lock_files = {
+            "package-lock.json",
+            "yarn.lock",
+            "poetry.lock",
+            "cargo.lock",
+            "pnpm-lock.yaml",
+        }
         if not allow_lock_files and parts[-1] in lock_files:
             return True
 
         # Common temporary or build patterns
         import os
+
         _, ext = os.path.splitext(normalized)
         temp_extensions = {".tmp", ".temp", ".swp", ".bak"}
         if ext in temp_extensions:

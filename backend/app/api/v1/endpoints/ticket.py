@@ -9,8 +9,8 @@ from app.application.ticket_application_service import (
 )
 from app.auth.dependencies import get_optional_current_user
 from app.db import get_db
-from app.models.user import User
 from app.models.enums import TicketStatus
+from app.models.user import User
 from app.repositories.ticket_query_repository import ticket_query_repository
 from app.schemas.review import PaginatedResponse
 from app.schemas.ticket import TicketResponse, TicketStatusUpdate
@@ -35,13 +35,13 @@ async def create_ticket(
     finding_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User | None = Depends(get_optional_current_user),
-    app_service: TicketApplicationService = Depends(
-        lambda: ticket_application_service
-    ),
+    app_service: TicketApplicationService = Depends(lambda: ticket_application_service),
 ) -> TicketResponse:
     """Create a bug ticket from a code review finding."""
     try:
-        return await app_service.create_ticket(db, finding_id, user_id=current_user.id if current_user else None)
+        return await app_service.create_ticket(
+            db, finding_id, user_id=current_user.id if current_user else None
+        )
     except FindingNotFoundError as fnf_err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -78,9 +78,7 @@ async def create_ticket(
 async def get_ticket_details(
     ticket_id: int,
     db: AsyncSession = Depends(get_db),
-    app_service: TicketApplicationService = Depends(
-        lambda: ticket_application_service
-    ),
+    app_service: TicketApplicationService = Depends(lambda: ticket_application_service),
 ) -> TicketResponse:
     """Retrieve details for a specific bug ticket."""
     try:
@@ -115,9 +113,7 @@ async def update_ticket_status(
     ticket_id: int,
     payload: TicketStatusUpdate,
     db: AsyncSession = Depends(get_db),
-    app_service: TicketApplicationService = Depends(
-        lambda: ticket_application_service
-    ),
+    app_service: TicketApplicationService = Depends(lambda: ticket_application_service),
 ) -> TicketResponse:
     """Transition a ticket to a new status with validation."""
     try:
@@ -160,7 +156,9 @@ async def list_tickets(
 ) -> PaginatedResponse[TicketResponse]:
     """Retrieve tickets with optional status filtering and pagination."""
     try:
-        items, total = await ticket_query_repository.search_tickets(db, page, limit, status)
+        items, total = await ticket_query_repository.search_tickets(
+            db, page, limit, status
+        )
         pages = (total + limit - 1) // limit if limit > 0 else 1
         return PaginatedResponse(
             items=items,

@@ -41,7 +41,8 @@ export const QualityGauge: React.FC<QualityGaugeProps> = ({ score }) => {
   const radius = 50;
   const strokeWidth = 10;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
+  const strokeDashoffset =
+    circumference - (animatedScore / 100) * circumference;
 
   return (
     <div

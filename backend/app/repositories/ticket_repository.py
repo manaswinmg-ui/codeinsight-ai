@@ -22,9 +22,13 @@ class TicketRepository(BaseRepository[Ticket]):
         result = await db.execute(select(Ticket).filter(Ticket.id == ticket_id))
         return result.scalars().first()
 
-    async def get_by_finding_id(self, db: AsyncSession, finding_id: int) -> Ticket | None:
+    async def get_by_finding_id(
+        self, db: AsyncSession, finding_id: int
+    ) -> Ticket | None:
         """Retrieve the Ticket associated with a given Finding ID."""
-        result = await db.execute(select(Ticket).filter(Ticket.finding_id == finding_id))
+        result = await db.execute(
+            select(Ticket).filter(Ticket.finding_id == finding_id)
+        )
         return result.scalars().first()
 
     async def update_status(

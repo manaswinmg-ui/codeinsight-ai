@@ -1,10 +1,11 @@
 import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.repository_embedding import RepositoryEmbedding
-from app.config import settings
 from app.ai.providers.base import AIProvider
+from app.config import settings
+from app.models.repository_embedding import RepositoryEmbedding
 
 logger = logging.getLogger("app.ai.retrieval")
 
@@ -40,7 +41,7 @@ class RepositoryRetrievalService:
         files: list of dicts with keys: 'path', 'content'
         """
         logger.info(f"Indexing repository {repository_id} with {len(files)} files...")
-        
+
         # Collect all chunks across all files
         chunks_to_embed = []
         chunk_metadata = []
@@ -48,7 +49,7 @@ class RepositoryRetrievalService:
         for f in files:
             path = f["path"]
             content = f["content"]
-            
+
             # Simple chunking
             file_chunks = self.chunk_text(content)
             for idx, chunk_content in enumerate(file_chunks):
@@ -56,19 +57,23 @@ class RepositoryRetrievalService:
                 chunk_metadata.append({"path": path, "index": idx})
 
         if not chunks_to_embed:
-            logger.warning(f"No text content found to embed for repository {repository_id}.")
+            logger.warning(
+                f"No text content found to embed for repository {repository_id}."
+            )
             return
 
         # Generate embeddings in batches (e.g. batch size of 20)
         batch_size = 20
         all_embeddings = []
         for i in range(0, len(chunks_to_embed), batch_size):
-            batch = chunks_to_embed[i:i + batch_size]
+            batch = chunks_to_embed[i : i + batch_size]
             embeddings = await provider.embed(batch)
             all_embeddings.extend(embeddings)
 
         # Store embeddings in DB
-        for metadata, content, embedding in zip(chunk_metadata, chunks_to_embed, all_embeddings):
+        for metadata, content, embedding in zip(
+            chunk_metadata, chunks_to_embed, all_embeddings, strict=False
+        ):
             db_embedding = RepositoryEmbedding(
                 repository_id=repository_id,
                 file_path=metadata["path"],
@@ -79,12 +84,14 @@ class RepositoryRetrievalService:
             db.add(db_embedding)
 
         await db.commit()
-        logger.info(f"Successfully stored {len(all_embeddings)} embeddings for repository {repository_id}.")
+        logger.info(
+            f"Successfully stored {len(all_embeddings)} embeddings for repository {repository_id}."
+        )
 
     @staticmethod
     def calculate_cosine_similarity(v1: list[float], v2: list[float]) -> float:
         """Compute cosine similarity between two numeric vectors."""
-        dot_product = sum(x * y for x, y in zip(v1, v2))
+        dot_product = sum(x * y for x, y in zip(v1, v2, strict=False))
         norm_a = sum(x * x for x in v1) ** 0.5
         norm_b = sum(x * x for x in v2) ** 0.5
         if norm_a == 0 or norm_b == 0:
@@ -108,7 +115,9 @@ class RepositoryRetrievalService:
 
         # Fetch all embeddings for repository from SQLite
         result = await db.execute(
-            select(RepositoryEmbedding).filter(RepositoryEmbedding.repository_id == repository_id)
+            select(RepositoryEmbedding).filter(
+                RepositoryEmbedding.repository_id == repository_id
+            )
         )
         db_embeddings = result.scalars().all()
 
@@ -120,17 +129,19 @@ class RepositoryRetrievalService:
         for db_emb in db_embeddings:
             sim = self.calculate_cosine_similarity(query_vector, db_emb.embedding)
             if sim >= settings.AI_SIMILARITY_THRESHOLD:
-                matches.append({
-                    "path": db_emb.file_path,
-                    "content": db_emb.content,
-                    "similarity": sim,
-                })
+                matches.append(
+                    {
+                        "path": db_emb.file_path,
+                        "content": db_emb.content,
+                        "similarity": sim,
+                    }
+                )
 
         # Sort by similarity descending
         matches.sort(key=lambda x: x["similarity"], reverse=True)
 
         # Return top N retrieved files/chunks
-        return matches[:settings.AI_MAX_RETRIEVED_FILES]
+        return matches[: settings.AI_MAX_RETRIEVED_FILES]
 
 
 repository_retrieval_service = RepositoryRetrievalService()

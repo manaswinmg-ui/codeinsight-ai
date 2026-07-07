@@ -23,27 +23,15 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     # Add enhanced engineering metadata columns to findings (all nullable for backward compat)
     with op.batch_alter_table("findings", schema=None) as batch_op:
-        batch_op.add_column(
-            sa.Column("category", sa.String(length=50), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("confidence", sa.Integer(), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("impact", sa.Text(), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("why_it_matters", sa.Text(), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("improved_code", sa.Text(), nullable=True)
-        )
+        batch_op.add_column(sa.Column("category", sa.String(length=50), nullable=True))
+        batch_op.add_column(sa.Column("confidence", sa.Integer(), nullable=True))
+        batch_op.add_column(sa.Column("impact", sa.Text(), nullable=True))
+        batch_op.add_column(sa.Column("why_it_matters", sa.Text(), nullable=True))
+        batch_op.add_column(sa.Column("improved_code", sa.Text(), nullable=True))
         batch_op.add_column(
             sa.Column("estimated_fix_time", sa.String(length=100), nullable=True)
         )
-        batch_op.add_column(
-            sa.Column("references", sa.JSON(), nullable=True)
-        )
+        batch_op.add_column(sa.Column("references", sa.JSON(), nullable=True))
 
 
 def downgrade() -> None:

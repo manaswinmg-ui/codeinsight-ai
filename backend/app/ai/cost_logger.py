@@ -1,5 +1,4 @@
 import logging
-import time
 
 logger = logging.getLogger("app.ai.cost_logger")
 
@@ -13,14 +12,18 @@ class CostLogger:
     }
 
     @classmethod
-    def calculate_cost(cls, model: str, input_tokens: int, output_tokens: int = 0) -> float:
+    def calculate_cost(
+        cls, model: str, input_tokens: int, output_tokens: int = 0
+    ) -> float:
         """Calculate the USD cost based on token counts and model pricing."""
         model_pricing = cls.PRICING.get(model.lower().strip())
         if not model_pricing:
             # Fallback default pricing if model not matching
             model_pricing = cls.PRICING["gpt-5.4-mini"]
-        
-        cost = (input_tokens * model_pricing["input"]) + (output_tokens * model_pricing["output"])
+
+        cost = (input_tokens * model_pricing["input"]) + (
+            output_tokens * model_pricing["output"]
+        )
         return cost
 
     @classmethod

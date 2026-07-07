@@ -27,9 +27,7 @@ class TokenService:
 
     def create_refresh_token(self, user_id: int) -> str:
         """Create a long-lived refresh token."""
-        expire = datetime.now(UTC) + timedelta(
-            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
-        )
+        expire = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         payload = {
             "sub": str(user_id),
             "type": "refresh",

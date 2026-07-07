@@ -15,16 +15,120 @@ SEVERITY_ORDER = {
 }
 
 STOP_WORDS = {
-    "the", "is", "at", "which", "on", "a", "an", "and", "or", "to", "for", "in", "of", "with",
-    "this", "that", "it", "should", "could", "would", "be", "have", "has", "been", "was", "were",
-    "are", "do", "does", "did", "can", "will", "shall", "but", "as", "by", "from", "about",
-    "into", "through", "during", "before", "after", "above", "below", "up", "down", "out", "off",
-    "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why",
-    "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
-    "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "just", "don",
-    "now", "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours",
-    "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself",
-    "its", "itself", "they", "them", "their", "theirs", "themselves"
+    "the",
+    "is",
+    "at",
+    "which",
+    "on",
+    "a",
+    "an",
+    "and",
+    "or",
+    "to",
+    "for",
+    "in",
+    "of",
+    "with",
+    "this",
+    "that",
+    "it",
+    "should",
+    "could",
+    "would",
+    "be",
+    "have",
+    "has",
+    "been",
+    "was",
+    "were",
+    "are",
+    "do",
+    "does",
+    "did",
+    "can",
+    "will",
+    "shall",
+    "but",
+    "as",
+    "by",
+    "from",
+    "about",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "up",
+    "down",
+    "out",
+    "off",
+    "over",
+    "under",
+    "again",
+    "further",
+    "then",
+    "once",
+    "here",
+    "there",
+    "when",
+    "where",
+    "why",
+    "how",
+    "all",
+    "any",
+    "both",
+    "each",
+    "few",
+    "more",
+    "most",
+    "other",
+    "some",
+    "such",
+    "no",
+    "nor",
+    "not",
+    "only",
+    "own",
+    "same",
+    "so",
+    "than",
+    "too",
+    "very",
+    "s",
+    "t",
+    "just",
+    "don",
+    "now",
+    "i",
+    "me",
+    "my",
+    "myself",
+    "we",
+    "our",
+    "ours",
+    "ourselves",
+    "you",
+    "your",
+    "yours",
+    "yourself",
+    "yourselves",
+    "he",
+    "him",
+    "his",
+    "himself",
+    "she",
+    "her",
+    "hers",
+    "herself",
+    "its",
+    "itself",
+    "they",
+    "them",
+    "their",
+    "theirs",
+    "themselves",
 }
 
 
@@ -46,7 +150,9 @@ def clean_tokens(text: str) -> set[str]:
         .replace("[", " ")
         .replace("]", " ")
     )
-    return {w.strip() for w in cleaned.split() if w.strip() and w.strip() not in STOP_WORDS}
+    return {
+        w.strip() for w in cleaned.split() if w.strip() and w.strip() not in STOP_WORDS
+    }
 
 
 def jaccard_similarity(set1: set[str], set2: set[str]) -> float:
@@ -59,12 +165,14 @@ def jaccard_similarity(set1: set[str], set2: set[str]) -> float:
 def get_identifiers(f: Finding) -> set[str]:
     """Extract code identifiers (`quote`) or single-char variable names from title/description."""
     combined = f"{f.title} {f.description}"
-    quotes = set(re.findall(r'`([^`\s]+)`', combined))
+    quotes = set(re.findall(r"`([^`\s]+)`", combined))
     words = combined.split()
     single_chars = {
         w.strip(".,;:()[]`'\"")
         for w in words
-        if len(w.strip(".,;:()[]`'\"")) == 1 and w.strip(".,;:()[]`'\"").isalpha() and w.strip(".,;:()[]`'\"") != "a"
+        if len(w.strip(".,;:()[]`'\"")) == 1
+        and w.strip(".,;:()[]`'\"").isalpha()
+        and w.strip(".,;:()[]`'\"") != "a"
     }
     return quotes | single_chars
 
@@ -143,7 +251,7 @@ class FindingMerger:
         if has_identifier_conflict(f1, f2):
             return False
 
-        both_have_lines = (f1.line_start is not None and f2.line_start is not None)
+        both_have_lines = f1.line_start is not None and f2.line_start is not None
         lines_overlap = False
         if both_have_lines:
             f1_start = f1.line_start
@@ -159,7 +267,9 @@ class FindingMerger:
         t1_tokens = clean_tokens(f1.title)
         t2_tokens = clean_tokens(f2.title)
         title_jaccard = jaccard_similarity(t1_tokens, t2_tokens)
-        same_title = (f1.title.strip().lower() == f2.title.strip().lower()) or (title_jaccard >= 0.65)
+        same_title = (f1.title.strip().lower() == f2.title.strip().lower()) or (
+            title_jaccard >= 0.65
+        )
 
         d1_tokens = clean_tokens(f1.description)
         d2_tokens = clean_tokens(f2.description)
@@ -170,7 +280,9 @@ class FindingMerger:
             return same_title or (desc_jaccard >= 0.5)
 
         # Case B: One or both don't have lines
-        same_category = (f1.category == f2.category) if (f1.category and f2.category) else True
+        same_category = (
+            (f1.category == f2.category) if (f1.category and f2.category) else True
+        )
         if same_title:
             return True
 
@@ -216,7 +328,9 @@ class FindingMerger:
 
         return winner
 
-    def merge(self, static_findings: list[StaticFinding], ai_findings: list[Finding]) -> list[Finding]:
+    def merge(
+        self, static_findings: list[StaticFinding], ai_findings: list[Finding]
+    ) -> list[Finding]:
         """Merge, deduplicate, and sort findings from static and AI pipelines."""
         all_findings = []
         for sf in static_findings:
@@ -247,8 +361,7 @@ class FindingMerger:
 
         # Sort descending by severity
         unique_findings.sort(
-            key=lambda f: SEVERITY_ORDER.get(f.severity.upper(), 1),
-            reverse=True
+            key=lambda f: SEVERITY_ORDER.get(f.severity.upper(), 1), reverse=True
         )
 
         return unique_findings

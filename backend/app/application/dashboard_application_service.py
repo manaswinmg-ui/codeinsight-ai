@@ -35,21 +35,26 @@ class DashboardApplicationService:
             language_distribution=rev_metrics["language_distribution"],
         )
 
-    async def get_recent_reviews(self, db: AsyncSession, limit: int = 5) -> list[ReviewSummary]:
+    async def get_recent_reviews(
+        self, db: AsyncSession, limit: int = 5
+    ) -> list[ReviewSummary]:
         """Fetch the most recent reviews with dynamic quality and ticket metrics."""
         reviews = await self.review_query_repo.get_recent_reviews(db, limit)
         summaries = []
         for r in reviews:
             quality_score = compute_quality_score(r.findings)
             open_tickets_count = sum(
-                1 for f in r.findings
+                1
+                for f in r.findings
                 if f.ticket and f.ticket.status.name not in ("DONE", "CLOSED")
             )
             summaries.append(
                 ReviewSummary(
                     id=r.id,
                     language=r.language,
-                    status=r.status.name if hasattr(r.status, "name") else str(r.status),
+                    status=(
+                        r.status.name if hasattr(r.status, "name") else str(r.status)
+                    ),
                     created_at=r.created_at,
                     quality_score=quality_score,
                     findings_count=len(r.findings),
@@ -58,7 +63,9 @@ class DashboardApplicationService:
             )
         return summaries
 
-    async def get_recent_tickets(self, db: AsyncSession, limit: int = 5) -> list[TicketSummary]:
+    async def get_recent_tickets(
+        self, db: AsyncSession, limit: int = 5
+    ) -> list[TicketSummary]:
         """Fetch the most recent tickets with priority, status, and parent review ID."""
         tickets = await self.ticket_query_repo.get_recent_tickets(db, limit)
         summaries = []
@@ -66,8 +73,14 @@ class DashboardApplicationService:
             summaries.append(
                 TicketSummary(
                     id=t.id,
-                    priority=t.priority.name if hasattr(t.priority, "name") else str(t.priority),
-                    status=t.status.name if hasattr(t.status, "name") else str(t.status),
+                    priority=(
+                        t.priority.name
+                        if hasattr(t.priority, "name")
+                        else str(t.priority)
+                    ),
+                    status=(
+                        t.status.name if hasattr(t.status, "name") else str(t.status)
+                    ),
                     title=t.title,
                     review_id=t.finding.review_id if t.finding else 0,
                     created_at=t.created_at,

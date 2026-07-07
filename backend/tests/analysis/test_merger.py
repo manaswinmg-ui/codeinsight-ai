@@ -14,7 +14,7 @@ def test_merger_static_to_finding_mapping() -> None:
         rule="F401",
         tool="ruff",
         category="BEST_PRACTICE",
-        confidence=100
+        confidence=100,
     )
     f = merger._static_to_finding(sf)
     assert f.title == sf.title
@@ -35,7 +35,7 @@ def test_merger_deduplicate_same_title() -> None:
         line=2,
         column=1,
         rule="F401",
-        tool="ruff"
+        tool="ruff",
     )
     ai_finding = Finding(
         title="Unused Import",
@@ -43,7 +43,7 @@ def test_merger_deduplicate_same_title() -> None:
         severity="low",
         line_start=2,
         line_end=2,
-        confidence=80
+        confidence=80,
     )
 
     merged = merger.merge([sf], [ai_finding])
@@ -62,7 +62,7 @@ def test_merger_deduplicate_same_line_similar_description() -> None:
         line=3,
         column=1,
         rule="F401",
-        tool="ruff"
+        tool="ruff",
     )
     ai_finding = Finding(
         title="Clean up unused import",
@@ -70,7 +70,7 @@ def test_merger_deduplicate_same_line_similar_description() -> None:
         severity="low",
         line_start=3,
         line_end=3,
-        confidence=90
+        confidence=90,
     )
 
     merged = merger.merge([sf], [ai_finding])
@@ -88,7 +88,7 @@ def test_merger_no_deduplicate_different_lines() -> None:
         line=2,
         column=1,
         rule="F401",
-        tool="ruff"
+        tool="ruff",
     )
     ai_finding = Finding(
         title="Unused Import",
@@ -96,7 +96,7 @@ def test_merger_no_deduplicate_different_lines() -> None:
         severity="low",
         line_start=15,
         line_end=15,
-        confidence=80
+        confidence=80,
     )
 
     merged = merger.merge([sf], [ai_finding])
@@ -113,7 +113,7 @@ def test_merger_severity_sorting() -> None:
         line=2,
         column=1,
         rule="R1",
-        tool="tool"
+        tool="tool",
     )
     sf2 = StaticFinding(
         title="Critical Issue",
@@ -122,7 +122,7 @@ def test_merger_severity_sorting() -> None:
         line=3,
         column=1,
         rule="R2",
-        tool="tool"
+        tool="tool",
     )
     ai1 = Finding(
         title="High Issue",
@@ -130,7 +130,7 @@ def test_merger_severity_sorting() -> None:
         severity="high",
         line_start=4,
         line_end=4,
-        confidence=90
+        confidence=90,
     )
 
     merged = merger.merge([sf1, sf2], [ai1])
@@ -151,7 +151,7 @@ def test_merger_line_inheritance() -> None:
         column=1,
         rule="F401",
         tool="ruff",
-        confidence=50
+        confidence=50,
     )
     ai = Finding(
         title="Unused Import",
@@ -159,7 +159,7 @@ def test_merger_line_inheritance() -> None:
         severity="medium",
         line_start=None,
         line_end=None,
-        confidence=95
+        confidence=95,
     )
 
     merged = merger.merge([sf], [ai])

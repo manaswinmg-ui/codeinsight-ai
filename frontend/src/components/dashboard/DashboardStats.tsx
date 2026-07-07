@@ -22,7 +22,13 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
 }) => {
   if (loading) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '20px',
+        }}
+      >
         <SkeletonCard variant="metric" count={5} />
       </div>
     );
@@ -38,12 +44,19 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({
     .map(([lang]) => lang.charAt(0).toUpperCase() + lang.slice(1))
     .join(', ');
 
-  const langDesc = languagesCount > 0
-    ? `${languagesCount} lang(s) (${topLanguages || 'None'})`
-    : 'No languages reviewed';
+  const langDesc =
+    languagesCount > 0
+      ? `${languagesCount} lang(s) (${topLanguages || 'None'})`
+      : 'No languages reviewed';
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '20px',
+      }}
+    >
       <MetricCard
         title="Reviews"
         value={metrics.reviews_count}

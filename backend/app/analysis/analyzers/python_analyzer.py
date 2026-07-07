@@ -24,7 +24,9 @@ class PythonAnalyzer(BaseAnalyzer):
             # Root directory of backend is 4 levels up from this file:
             # app/analysis/analyzers/python_analyzer.py -> app/analysis/analyzers -> app/analysis -> app -> backend
             backend_dir = os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                )
             )
             venv_dir = os.path.join(backend_dir, ".venv")
 
@@ -68,12 +70,12 @@ class PythonAnalyzer(BaseAnalyzer):
         try:
             cmd = [ruff_path, "check", "--output-format", "json", temp_file_path]
             proc = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             try:
-                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=10.0)
+                stdout, stderr = await asyncio.wait_for(
+                    proc.communicate(), timeout=10.0
+                )
             except TimeoutError:
                 logger.error("Ruff static analysis execution timed out.")
                 # Terminate the process if timeout occurs
@@ -95,7 +97,9 @@ class PythonAnalyzer(BaseAnalyzer):
                 return []
 
             if not isinstance(diagnostics, list):
-                logger.error("Ruff JSON output is not a list. Type: %s", type(diagnostics))
+                logger.error(
+                    "Ruff JSON output is not a list. Type: %s", type(diagnostics)
+                )
                 return []
 
             for diag in diagnostics:
@@ -141,12 +145,14 @@ class PythonAnalyzer(BaseAnalyzer):
                     rule=code_val,
                     tool="ruff",
                     category=category,
-                    confidence=100
+                    confidence=100,
                 )
                 findings.append(finding)
 
         except FileNotFoundError:
-            logger.warning("Ruff executable not found at %s. Static analysis skipped.", ruff_path)
+            logger.warning(
+                "Ruff executable not found at %s. Static analysis skipped.", ruff_path
+            )
         except Exception as e:
             logger.error("Error executing Ruff static analysis: %s", e)
         finally:

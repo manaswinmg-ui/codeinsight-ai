@@ -1,5 +1,6 @@
 import hashlib
 import json
+
 from app.ai.providers.base import AIProvider
 
 
@@ -20,31 +21,35 @@ class MockAIProvider(AIProvider):
 
         if "escalate_insufficient" in p_lower:
             return "This query has insufficient context. Please provide more files."
-        
+
         if "escalate_low_confidence" in p_lower:
-            return json.dumps({
-                "response": "This is a low confidence response.",
-                "confidence": 45
-            })
-            
+            return json.dumps(
+                {"response": "This is a low confidence response.", "confidence": 45}
+            )
+
         if "raise_api_error" in p_lower and "5.4" in model:
             from app.ai.providers.base import AIError
+
             raise AIError("Mock API error on primary model")
 
         # Standard review or Q&A responses
         if "eval" in p_lower:
-            return json.dumps({
-                "summary": "Mock audit completed.",
-                "quality_score": 80,
-                "findings": [{
-                    "title": "Use of eval() Detected",
-                    "description": "Found eval usage",
-                    "severity": "critical",
-                    "category": "SECURITY",
-                    "confidence": 95,
-                    "line_start": 3
-                }]
-            })
+            return json.dumps(
+                {
+                    "summary": "Mock audit completed.",
+                    "quality_score": 80,
+                    "findings": [
+                        {
+                            "title": "Use of eval() Detected",
+                            "description": "Found eval usage",
+                            "severity": "critical",
+                            "category": "SECURITY",
+                            "confidence": 95,
+                            "line_start": 3,
+                        }
+                    ],
+                }
+            )
 
         return f"Mock reply from {model} to question: {user_prompt[:50]}..."
 
@@ -58,7 +63,7 @@ class MockAIProvider(AIProvider):
             for i in range(1536):
                 val = ((seed + i) * 31 % 1000) / 1000.0
                 vector.append(val)
-            
+
             # Normalize
             mag = sum(x * x for x in vector) ** 0.5
             norm_vector = [x / mag for x in vector] if mag > 0 else [0.0] * 1536

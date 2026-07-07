@@ -23,8 +23,18 @@ export const RecentTicketsPanel: React.FC<RecentTicketsPanelProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="glass-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>🎫 Recent Tickets</h3>
+      <div
+        className="glass-card"
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+          🎫 Recent Tickets
+        </h3>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <SkeletonCard variant="table-row" count={3} />
         </div>
@@ -33,23 +43,55 @@ export const RecentTicketsPanel: React.FC<RecentTicketsPanelProps> = ({
   }
 
   return (
-    <div className="glass-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
-      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>🎫 Recent Tickets</h3>
+    <div
+      className="glass-card"
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        minWidth: 0,
+      }}
+    >
+      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+        🎫 Recent Tickets
+      </h3>
       {tickets.length === 0 ? (
-        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <div
+          style={{
+            padding: '24px',
+            textAlign: 'center',
+            color: 'var(--text-muted)',
+          }}
+        >
           No tickets created yet. Open a finding in any review to file a ticket!
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              textAlign: 'left',
+              minWidth: '500px',
+            }}
+          >
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+              <tr
+                style={{
+                  borderBottom: '1px solid var(--border-color)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.85rem',
+                }}
+              >
                 <th style={{ padding: '12px 16px' }}>Priority</th>
                 <th style={{ padding: '12px 16px' }}>Ticket Title</th>
                 <th style={{ padding: '12px 16px' }}>Status</th>
                 <th style={{ padding: '12px 16px' }}>Parent Review</th>
                 <th style={{ padding: '12px 16px' }}>Created</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right' }}>Action</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right' }}>
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -85,7 +127,9 @@ export const RecentTicketsPanel: React.FC<RecentTicketsPanelProps> = ({
                       {tkt.priority}
                     </span>
                   </td>
-                  <td style={{ padding: '12px 16px', fontWeight: 600 }}>{tkt.title}</td>
+                  <td style={{ padding: '12px 16px', fontWeight: 600 }}>
+                    {tkt.title}
+                  </td>
                   <td style={{ padding: '12px 16px' }}>
                     <span
                       style={{
@@ -100,7 +144,10 @@ export const RecentTicketsPanel: React.FC<RecentTicketsPanelProps> = ({
                       {tkt.status}
                     </span>
                   </td>
-                  <td style={{ padding: '12px 16px' }} onClick={(e) => e.stopPropagation()}>
+                  <td
+                    style={{ padding: '12px 16px' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => onSelectReview(tkt.review_id)}
                       style={{
@@ -117,10 +164,19 @@ export const RecentTicketsPanel: React.FC<RecentTicketsPanelProps> = ({
                       Review #{tkt.review_id}
                     </button>
                   </td>
-                  <td style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      color: 'var(--text-muted)',
+                      fontSize: '0.8rem',
+                    }}
+                  >
                     {new Date(tkt.created_at).toLocaleDateString()}
                   </td>
-                  <td style={{ padding: '12px 16px', textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
+                  <td
+                    style={{ padding: '12px 16px', textAlign: 'right' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => onSelectReview(tkt.review_id)}
                       className="btn btn-secondary"

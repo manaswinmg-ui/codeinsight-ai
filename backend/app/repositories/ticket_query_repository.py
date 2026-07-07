@@ -14,14 +14,16 @@ class TicketQueryRepository:
             select(func.count(Ticket.id)).filter(
                 and_(
                     Ticket.status != TicketStatus.DONE,
-                    Ticket.status != TicketStatus.CLOSED
+                    Ticket.status != TicketStatus.CLOSED,
                 )
             )
         )
         open_count = result.scalar_one() or 0
         return {"open_tickets": open_count}
 
-    async def get_recent_tickets(self, db: AsyncSession, limit: int = 5) -> list[Ticket]:
+    async def get_recent_tickets(
+        self, db: AsyncSession, limit: int = 5
+    ) -> list[Ticket]:
         """Retrieve recent tickets, eagerly loading finding and review relationships."""
         result = await db.execute(
             select(Ticket)
@@ -32,7 +34,11 @@ class TicketQueryRepository:
         return list(result.scalars().all())
 
     async def search_tickets(
-        self, db: AsyncSession, page: int = 1, limit: int = 10, status: TicketStatus | None = None
+        self,
+        db: AsyncSession,
+        page: int = 1,
+        limit: int = 10,
+        status: TicketStatus | None = None,
     ) -> tuple[list[Ticket], int]:
         """Fetch a paginated list of tickets, optionally filtered by status."""
         # Total count query

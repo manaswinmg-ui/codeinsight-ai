@@ -29,27 +29,81 @@ const getEstimatedFixTime = (severity: string): string => {
 };
 
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+  <span
+    style={{
+      fontSize: '0.68rem',
+      fontWeight: 700,
+      letterSpacing: '0.8px',
+      textTransform: 'uppercase',
+      color: 'var(--text-muted)',
+    }}
+  >
     {children}
   </span>
 );
 
-const InfoBlock = ({ icon, label, color, children }: { icon: string; label: string; color: string; children: React.ReactNode }) => (
-  <div style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${color}22`, borderLeft: `3px solid ${color}`, borderRadius: '8px', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-    <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color }}>{icon} {label}</span>
-    <span style={{ fontSize: '0.84rem', lineHeight: '1.55', color: 'var(--text-secondary)' }}>{children}</span>
+const InfoBlock = ({
+  icon,
+  label,
+  color,
+  children,
+}: {
+  icon: string;
+  label: string;
+  color: string;
+  children: React.ReactNode;
+}) => (
+  <div
+    style={{
+      background: 'rgba(255,255,255,0.025)',
+      border: `1px solid ${color}22`,
+      borderLeft: `3px solid ${color}`,
+      borderRadius: '8px',
+      padding: '10px 14px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+    }}
+  >
+    <span
+      style={{
+        fontSize: '0.68rem',
+        fontWeight: 700,
+        letterSpacing: '0.8px',
+        color,
+      }}
+    >
+      {icon} {label}
+    </span>
+    <span
+      style={{
+        fontSize: '0.84rem',
+        lineHeight: '1.55',
+        color: 'var(--text-secondary)',
+      }}
+    >
+      {children}
+    </span>
   </div>
 );
 
-export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = false }: ReviewResultsProps) => {
+export const ReviewResults = ({
+  status,
+  reviewData,
+  setReviewData,
+  showDebug = false,
+}: ReviewResultsProps) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(
+    new Set()
+  );
   const [activeTicket, setActiveTicket] = useState<TicketData | null>(null);
   const [fetchingTicketId, setFetchingTicketId] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const [selectedFindingInCode, setSelectedFindingInCode] = useState<Finding | null>(null);
+  const [selectedFindingInCode, setSelectedFindingInCode] =
+    useState<Finding | null>(null);
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
   const decorationsRef = useRef<string[]>([]);
@@ -80,19 +134,30 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
       editor.focus();
 
       if (decorationsRef.current.length > 0) {
-        decorationsRef.current = editor.deltaDecorations(decorationsRef.current, []);
+        decorationsRef.current = editor.deltaDecorations(
+          decorationsRef.current,
+          []
+        );
       }
 
-      decorationsRef.current = editor.deltaDecorations([], [
-        {
-          range: new monaco.Range(finding.line_start, 1, finding.line_start, 1),
-          options: {
-            isWholeLine: true,
-            className: 'monaco-line-highlight-finding',
-            marginClassName: 'monaco-margin-highlight-finding',
+      decorationsRef.current = editor.deltaDecorations(
+        [],
+        [
+          {
+            range: new monaco.Range(
+              finding.line_start,
+              1,
+              finding.line_start,
+              1
+            ),
+            options: {
+              isWholeLine: true,
+              className: 'monaco-line-highlight-finding',
+              marginClassName: 'monaco-margin-highlight-finding',
+            },
           },
-        },
-      ]);
+        ]
+      );
     }
   };
 
@@ -112,11 +177,17 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
               isWholeLine: false,
               glyphMarginClassName: `monaco-glyph-margin-${severity}`,
               overviewRuler: {
-                color: severity === 'critical' || severity === 'high' ? '#ef4444' : '#fbbf24',
+                color:
+                  severity === 'critical' || severity === 'high'
+                    ? '#ef4444'
+                    : '#fbbf24',
                 position: monaco.editor.OverviewRulerLane.Right,
               },
               minimap: {
-                color: severity === 'critical' || severity === 'high' ? '#ef4444' : '#fbbf24',
+                color:
+                  severity === 'critical' || severity === 'high'
+                    ? '#ef4444'
+                    : '#fbbf24',
                 position: monaco.editor.MinimapPosition.Inline,
               },
             },
@@ -181,14 +252,18 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
       const ticket = await response.json();
       setActiveTicket(ticket);
     } catch (err) {
-      setFetchError(err instanceof Error ? err.message : 'Error fetching ticket');
+      setFetchError(
+        err instanceof Error ? err.message : 'Error fetching ticket'
+      );
     } finally {
       setFetchingTicketId(null);
     }
   };
 
   // Extract all findings with associated tickets
-  const ticketedFindings = reviewData.findings.filter((f) => f.ticket_id != null);
+  const ticketedFindings = reviewData.findings.filter(
+    (f) => f.ticket_id != null
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -219,13 +294,26 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
       )}
 
       {fetchError && (
-        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger-color)', padding: '12px', borderRadius: '8px', fontSize: '0.85rem', color: '#f87171' }}>
+        <div
+          style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid var(--danger-color)',
+            padding: '12px',
+            borderRadius: '8px',
+            fontSize: '0.85rem',
+            color: '#f87171',
+          }}
+        >
           {fetchError}
         </div>
       )}
 
       {/* Tabs Controller */}
-      <ReviewTabs activeTab={activeTab} onTabChange={setActiveTab} showDebug={showDebug} />
+      <ReviewTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        showDebug={showDebug}
+      />
 
       {/* Render Tab Contents */}
       {activeTab === 'overview' && (
@@ -233,7 +321,15 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
       )}
 
       {activeTab === 'code' && (
-        <div style={{ display: 'flex', gap: '24px', height: '520px', width: '100%', alignItems: 'stretch' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '24px',
+            height: '520px',
+            width: '100%',
+            alignItems: 'stretch',
+          }}
+        >
           {/* Left Column: Monaco Editor Container */}
           <div
             style={{
@@ -256,7 +352,8 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
                 readOnly: true,
                 minimap: { enabled: true },
                 fontSize: 13,
-                fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                fontFamily:
+                  'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
                 lineNumbers: 'on',
                 glyphMargin: true,
                 roundedSelection: true,
@@ -279,11 +376,25 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
               height: '100%',
             }}
           >
-            <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 700 }}>
+            <h4
+              style={{
+                margin: 0,
+                fontSize: '0.9rem',
+                color: 'var(--text-secondary)',
+                fontWeight: 700,
+              }}
+            >
               📌 Review Findings ({reviewData.findings.length})
             </h4>
             {reviewData.findings.length === 0 ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              <div
+                style={{
+                  padding: '20px',
+                  textAlign: 'center',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.85rem',
+                }}
+              >
                 No findings in this review.
               </div>
             ) : (
@@ -296,29 +407,71 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
                     style={{
                       padding: '12px',
                       borderRadius: '8px',
-                      background: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                      border: isSelected ? '1px solid var(--accent-color)' : '1px solid var(--border-color)',
+                      background: isSelected
+                        ? 'rgba(99, 102, 241, 0.12)'
+                        : 'rgba(255, 255, 255, 0.02)',
+                      border: isSelected
+                        ? '1px solid var(--accent-color)'
+                        : '1px solid var(--border-color)',
                       borderLeft: `4px solid ${f.severity.toLowerCase() === 'critical' ? '#e879f9' : f.severity.toLowerCase() === 'high' ? '#f87171' : '#fbbf24'}`,
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', wordBreak: 'break-word' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                          wordBreak: 'break-word',
+                        }}
+                      >
                         {f.title}
                       </span>
                       {f.line_start != null && (
-                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-color)', whiteSpace: 'nowrap' }}>
+                        <span
+                          style={{
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            color: 'var(--accent-color)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           L{f.line_start}
                         </span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '6px',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                      }}
+                    >
                       <SeverityBadge severity={f.severity} />
                       <CategoryBadge category={f.category} />
                     </div>
                     {isSelected && (
-                      <div style={{ marginTop: '8px', fontSize: '0.78rem', color: 'var(--text-secondary)', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '8px', lineHeight: '1.4' }}>
+                      <div
+                        style={{
+                          marginTop: '8px',
+                          fontSize: '0.78rem',
+                          color: 'var(--text-secondary)',
+                          borderTop: '1px solid rgba(255,255,255,0.06)',
+                          paddingTop: '8px',
+                          lineHeight: '1.4',
+                        }}
+                      >
                         {f.description}
                       </div>
                     )}
@@ -332,15 +485,31 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
 
       {activeTab === 'findings' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <h3
+              style={{
+                margin: 0,
+                fontSize: '1.1rem',
+                color: 'var(--text-secondary)',
+              }}
+            >
               Detailed Findings ({reviewData.findings.length})
             </h3>
             {reviewData.findings.length > 0 && (
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   className="btn btn-secondary"
-                  onClick={() => setExpandedIds(new Set(reviewData.findings.map(f => f.id)))}
+                  onClick={() =>
+                    setExpandedIds(
+                      new Set(reviewData.findings.map((f) => f.id))
+                    )
+                  }
                   style={{ padding: '4px 10px', fontSize: '0.75rem' }}
                 >
                   Expand All
@@ -366,13 +535,18 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
             reviewData.findings.map((finding) => {
               const isCardExpanded = expandedIds.has(finding.id);
               const isDescExpanded = expandedDescriptions.has(finding.id);
-              const hasExtras = finding.why_it_matters || finding.test_case_hint || (finding.references && finding.references.length > 0);
+              const hasExtras =
+                finding.why_it_matters ||
+                finding.test_case_hint ||
+                (finding.references && finding.references.length > 0);
 
               const descriptionLimit = 180;
-              const isLongDescription = finding.description.length > descriptionLimit;
-              const displayedDescription = isDescExpanded || isCardExpanded
-                ? finding.description
-                : `${finding.description.substring(0, descriptionLimit)}...`;
+              const isLongDescription =
+                finding.description.length > descriptionLimit;
+              const displayedDescription =
+                isDescExpanded || isCardExpanded
+                  ? finding.description
+                  : `${finding.description.substring(0, descriptionLimit)}...`;
 
               const mockSource = finding.suggested_fix ? 'ruff' : 'ai'; // Simple heuristics to assign a source if none exists
               const mockConfidence = finding.confidence ?? 85;
@@ -393,25 +567,91 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
                   onClick={() => toggleExpandCard(finding.id)}
                 >
                   {/* Card Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
-                      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: '12px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                        flex: 1,
+                      }}
+                    >
+                      <h4
+                        style={{
+                          margin: 0,
+                          fontSize: '1rem',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                        }}
+                      >
                         {finding.title}
                       </h4>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '8px',
+                          flexWrap: 'wrap',
+                          alignItems: 'center',
+                        }}
+                      >
                         <SeverityBadge severity={finding.severity} />
-                        <SourceBadge source={finding.category?.toLowerCase() === 'style' ? 'ruff' : mockSource} />
+                        <SourceBadge
+                          source={
+                            finding.category?.toLowerCase() === 'style'
+                              ? 'ruff'
+                              : mockSource
+                          }
+                        />
                         <CategoryBadge category={finding.category} />
                         <ConfidenceBadge value={mockConfidence} />
-                        <span style={{ fontSize: '0.69rem', fontWeight: 600, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-color)', padding: '2px 7px', borderRadius: '4px' }}>
+                        <span
+                          style={{
+                            fontSize: '0.69rem',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid var(--border-color)',
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                          }}
+                        >
                           ⏱ {getEstimatedFixTime(finding.severity)}
                         </span>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                        flexShrink: 0,
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {finding.line_start != null && (
-                        <span style={{ fontSize: '0.69rem', fontWeight: 700, color: 'var(--accent-color)', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '2px 7px', borderRadius: '4px' }}>
-                          📍 L{finding.line_start}{finding.line_end && finding.line_end !== finding.line_start ? `–${finding.line_end}` : ''}
+                        <span
+                          style={{
+                            fontSize: '0.69rem',
+                            fontWeight: 700,
+                            color: 'var(--accent-color)',
+                            background: 'rgba(99, 102, 241, 0.08)',
+                            border: '1px solid rgba(99, 102, 241, 0.2)',
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          📍 L{finding.line_start}
+                          {finding.line_end &&
+                          finding.line_end !== finding.line_start
+                            ? `–${finding.line_end}`
+                            : ''}
                         </span>
                       )}
                       <CreateTicketButton
@@ -420,9 +660,14 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
                         onCreateSuccess={handleTicketCreated}
                         onViewTicket={handleViewTicket}
                       />
-                      <span 
+                      <span
                         onClick={() => toggleExpandCard(finding.id)}
-                        style={{ fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+                        style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          cursor: 'pointer',
+                          padding: '4px',
+                        }}
                       >
                         {isCardExpanded ? '▲' : '▼'}
                       </span>
@@ -430,7 +675,14 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
                   </div>
 
                   {/* Card Description */}
-                  <div style={{ margin: 0, fontSize: '0.88rem', lineHeight: '1.55', color: 'var(--text-secondary)' }}>
+                  <div
+                    style={{
+                      margin: 0,
+                      fontSize: '0.88rem',
+                      lineHeight: '1.55',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
                     <span>{displayedDescription}</span>
                     {isLongDescription && !isCardExpanded && (
                       <button
@@ -453,67 +705,227 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
 
                   {/* Expanded Content */}
                   {isCardExpanded && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '4px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        marginTop: '4px',
+                        width: '100%',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {finding.impact && (
-                        <InfoBlock icon="🎯" label="Impact" color="#fbbf24">{finding.impact}</InfoBlock>
+                        <InfoBlock icon="🎯" label="Impact" color="#fbbf24">
+                          {finding.impact}
+                        </InfoBlock>
                       )}
 
                       {finding.suggested_fix && (
-                        <div style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div
+                          style={{
+                            background: 'var(--bg-tertiary)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '6px',
+                          }}
+                        >
                           <SectionLabel>Suggested Fix</SectionLabel>
-                          <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '0.82rem', color: '#a5b4fc', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                          <pre
+                            style={{
+                              margin: 0,
+                              fontFamily: 'monospace',
+                              fontSize: '0.82rem',
+                              color: '#a5b4fc',
+                              overflowX: 'auto',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-all',
+                            }}
+                          >
                             <code>{finding.suggested_fix}</code>
                           </pre>
                         </div>
                       )}
 
                       {finding.improved_code && (
-                        <div style={{ background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.18)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: '#34d399' }}>✨ IMPROVED CODE</span>
-                          <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '0.82rem', color: '#6ee7b7', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                        <div
+                          style={{
+                            background: 'rgba(52,211,153,0.04)',
+                            border: '1px solid rgba(52,211,153,0.18)',
+                            borderRadius: '8px',
+                            padding: '12px 16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '6px',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              letterSpacing: '0.8px',
+                              color: '#34d399',
+                            }}
+                          >
+                            ✨ IMPROVED CODE
+                          </span>
+                          <pre
+                            style={{
+                              margin: 0,
+                              fontFamily: 'monospace',
+                              fontSize: '0.82rem',
+                              color: '#6ee7b7',
+                              overflowX: 'auto',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-all',
+                            }}
+                          >
                             <code>{finding.improved_code}</code>
                           </pre>
                         </div>
                       )}
 
-                      {fetchingTicketId === finding.ticket_id && finding.ticket_id != null && (
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Loading ticket...</span>
-                        </div>
-                      )}
+                      {fetchingTicketId === finding.ticket_id &&
+                        finding.ticket_id != null && (
+                          <div
+                            style={{
+                              display: 'flex',
+                              gap: '12px',
+                              alignItems: 'center',
+                              marginTop: '4px',
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '0.75rem',
+                                color: 'var(--text-muted)',
+                              }}
+                            >
+                              Loading ticket...
+                            </span>
+                          </div>
+                        )}
 
                       {hasExtras && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid var(--border-color)', paddingTop: '14px', marginTop: '4px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            borderTop: '1px solid var(--border-color)',
+                            paddingTop: '14px',
+                            marginTop: '4px',
+                          }}
+                        >
                           {finding.why_it_matters && (
-                            <InfoBlock icon="💡" label="Why It Matters" color="#a78bfa">{finding.why_it_matters}</InfoBlock>
+                            <InfoBlock
+                              icon="💡"
+                              label="Why It Matters"
+                              color="#a78bfa"
+                            >
+                              {finding.why_it_matters}
+                            </InfoBlock>
                           )}
                           {finding.test_case_hint && (
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.14)', padding: '10px 14px', borderRadius: '8px' }}>
-                              <span style={{ fontSize: '1rem', lineHeight: '1.2' }}>🧪</span>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--accent-color)' }}>TEST CASE HINT</span>
-                                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>{finding.test_case_hint}</span>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '8px',
+                                background: 'rgba(99,102,241,0.04)',
+                                border: '1px solid rgba(99,102,241,0.14)',
+                                padding: '10px 14px',
+                                borderRadius: '8px',
+                              }}
+                            >
+                              <span
+                                style={{ fontSize: '1rem', lineHeight: '1.2' }}
+                              >
+                                🧪
+                              </span>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '2px',
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.8px',
+                                    color: 'var(--accent-color)',
+                                  }}
+                                >
+                                  TEST CASE HINT
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: '0.82rem',
+                                    color: 'var(--text-secondary)',
+                                    lineHeight: '1.4',
+                                  }}
+                                >
+                                  {finding.test_case_hint}
+                                </span>
                               </div>
                             </div>
                           )}
-                          {finding.references && finding.references.length > 0 && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <SectionLabel>📚 References</SectionLabel>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                {finding.references.map((ref, i) => {
-                                  const isUrl = ref.startsWith('http://') || ref.startsWith('https://');
-                                  return isUrl ? (
-                                    <a key={i} href={ref} target="_blank" rel="noopener noreferrer"
-                                      style={{ fontSize: '0.81rem', color: '#60a5fa', textDecoration: 'none', wordBreak: 'break-all' }}>
-                                      🔗 {ref}
-                                    </a>
-                                  ) : (
-                                    <span key={i} style={{ fontSize: '0.81rem', color: 'var(--text-muted)' }}>• {ref}</span>
-                                  );
-                                })}
+                          {finding.references &&
+                            finding.references.length > 0 && (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '6px',
+                                }}
+                              >
+                                <SectionLabel>📚 References</SectionLabel>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  {finding.references.map((ref, i) => {
+                                    const isUrl =
+                                      ref.startsWith('http://') ||
+                                      ref.startsWith('https://');
+                                    return isUrl ? (
+                                      <a
+                                        key={i}
+                                        href={ref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                          fontSize: '0.81rem',
+                                          color: '#60a5fa',
+                                          textDecoration: 'none',
+                                          wordBreak: 'break-all',
+                                        }}
+                                      >
+                                        🔗 {ref}
+                                      </a>
+                                    ) : (
+                                      <span
+                                        key={i}
+                                        style={{
+                                          fontSize: '0.81rem',
+                                          color: 'var(--text-muted)',
+                                        }}
+                                      >
+                                        • {ref}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
                         </div>
                       )}
                     </div>
@@ -527,7 +939,13 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
 
       {activeTab === 'tickets' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: '1.1rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
             Associated Tickets ({ticketedFindings.length})
           </h3>
 
@@ -538,39 +956,132 @@ export const ReviewResults = ({ status, reviewData, setReviewData, showDebug = f
               icon="🎫"
             />
           ) : (
-            <div className="glass-card" style={{ padding: 0, overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div
+              className="glass-card"
+              style={{ padding: 0, overflowX: 'auto' }}
+            >
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  textAlign: 'left',
+                }}
+              >
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.01)' }}>
-                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>PRIORITY</th>
-                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>STATUS</th>
-                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>TITLE</th>
-                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>CREATED</th>
-                    <th style={{ padding: '16px 24px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textAlign: 'right' }}>ACTION</th>
+                  <tr
+                    style={{
+                      borderBottom: '1px solid var(--border-color)',
+                      background: 'rgba(255,255,255,0.01)',
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: '16px 24px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      PRIORITY
+                    </th>
+                    <th
+                      style={{
+                        padding: '16px 24px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      STATUS
+                    </th>
+                    <th
+                      style={{
+                        padding: '16px 24px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      TITLE
+                    </th>
+                    <th
+                      style={{
+                        padding: '16px 24px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      CREATED
+                    </th>
+                    <th
+                      style={{
+                        padding: '16px 24px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                        textAlign: 'right',
+                      }}
+                    >
+                      ACTION
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {ticketedFindings.map((finding) => (
-                    <tr key={finding.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s' }} className="table-row-hover">
+                    <tr
+                      key={finding.id}
+                      style={{
+                        borderBottom: '1px solid var(--border-color)',
+                        transition: 'background-color 0.2s',
+                      }}
+                      className="table-row-hover"
+                    >
                       <td style={{ padding: '16px 24px' }}>
                         <SeverityBadge severity={finding.severity} />
                       </td>
                       <td style={{ padding: '16px 24px' }}>
-                        <span style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            background: 'rgba(56, 189, 248, 0.1)',
+                            color: '#38bdf8',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontWeight: 700,
+                          }}
+                        >
                           OPEN
                         </span>
                       </td>
-                      <td style={{ padding: '16px 24px', fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <td
+                        style={{
+                          padding: '16px 24px',
+                          fontSize: '0.88rem',
+                          fontWeight: 600,
+                          color: 'var(--text-primary)',
+                        }}
+                      >
                         {finding.title}
                       </td>
-                      <td style={{ padding: '16px 24px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <td
+                        style={{
+                          padding: '16px 24px',
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
                         {formattedDate}
                       </td>
                       <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                         <button
                           className="btn btn-secondary"
                           onClick={() => handleViewTicket(finding.ticket_id!)}
-                          style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: '4px' }}
+                          style={{
+                            padding: '6px 12px',
+                            fontSize: '0.75rem',
+                            borderRadius: '4px',
+                          }}
                         >
                           Open Ticket
                         </button>

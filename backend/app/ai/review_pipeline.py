@@ -36,7 +36,11 @@ class AIReviewPipeline:
             analyzer = get_analyzer(review.language)
             static_task = asyncio.create_task(analyzer.analyze(review.code))
         except Exception as e:
-            logger.error("Failed to initiate static analysis for language %s: %s", review.language, e)
+            logger.error(
+                "Failed to initiate static analysis for language %s: %s",
+                review.language,
+                e,
+            )
 
         prompt_package = self.prompt_builder.build(review)
 
@@ -44,7 +48,7 @@ class AIReviewPipeline:
             results = await asyncio.gather(
                 static_task,
                 self.ai_client.review(prompt_package),
-                return_exceptions=True
+                return_exceptions=True,
             )
 
             static_res, raw_response = results[0], results[1]
@@ -70,4 +74,3 @@ class AIReviewPipeline:
             quality_score=ai_result.quality_score,
             findings=merged_findings,
         )
-

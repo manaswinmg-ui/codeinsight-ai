@@ -46,7 +46,11 @@ interface ReviewWorkspaceProps {
   showDebug?: boolean;
 }
 
-export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showDebug }: ReviewWorkspaceProps) => {
+export const ReviewWorkspace = ({
+  initialReviewId,
+  onClearInitialReviewId,
+  showDebug,
+}: ReviewWorkspaceProps) => {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('python');
   const [fileName, setFileName] = useState<string | null>(null);
@@ -76,7 +80,9 @@ export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showD
       try {
         const response = await fetch(`/api/v1/reviews/${activeReviewId}`);
         if (!response.ok) {
-          throw new Error(`Failed to fetch review status: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch review status: ${response.statusText}`
+          );
         }
         const data: ReviewDetail = await response.json();
 
@@ -100,7 +106,11 @@ export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showD
       } catch (err) {
         clearInterval(intervalId);
         setStatus('error');
-        setError(err instanceof Error ? err.message : 'An error occurred during status polling.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'An error occurred during status polling.'
+        );
         setActiveReviewId(null);
       }
     };
@@ -203,13 +213,20 @@ export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showD
         onClearInitialReviewId();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [initialReviewId]);
 
   return (
     <div className="workspace-container" style={{ minHeight: '85vh' }}>
       {/* Main Content Workspace */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '32px',
+          minWidth: 0,
+        }}
+      >
         {/* Page Header */}
         <header
           style={{
@@ -280,7 +297,12 @@ export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showD
 
           {/* Right Column: Execution control & Output layout */}
           <section
-            style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px',
+              minWidth: 0,
+            }}
           >
             <div
               className="glass-card"

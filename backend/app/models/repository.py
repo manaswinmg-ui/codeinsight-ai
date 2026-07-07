@@ -27,7 +27,7 @@ class Repository(Base):
     overall_quality: Mapped[int | None] = mapped_column(Integer, nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     metrics: Mapped[dict | None] = mapped_column(sa.JSON, nullable=True)
-    
+
     root_path: Mapped[str | None] = mapped_column(sa.String(1024), nullable=True)
     total_files: Mapped[int] = mapped_column(sa.Integer, default=0, nullable=False)
     supported_files: Mapped[int] = mapped_column(sa.Integer, default=0, nullable=False)
@@ -63,5 +63,7 @@ class FileReview(Base):
     size_bytes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     # Relationships
-    repository: Mapped[Repository] = relationship("Repository", back_populates="file_reviews")
+    repository: Mapped[Repository] = relationship(
+        "Repository", back_populates="file_reviews"
+    )
     review: Mapped[Review] = relationship("Review")

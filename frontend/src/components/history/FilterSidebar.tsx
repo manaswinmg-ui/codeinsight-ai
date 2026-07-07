@@ -39,8 +39,18 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         alignSelf: 'flex-start',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>🛠️ Filters</h3>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid var(--border-color)',
+          paddingBottom: '12px',
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
+          🛠️ Filters
+        </h3>
         <button
           onClick={onReset}
           style={{
@@ -58,7 +68,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Filter by Status */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Status</span>
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          Status
+        </span>
         <select
           value={filters.status}
           onChange={(e) => updateField('status', e.target.value)}
@@ -82,7 +100,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Filter by Language */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Language</span>
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          Language
+        </span>
         <select
           value={filters.language}
           onChange={(e) => updateField('language', e.target.value)}
@@ -109,7 +135,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Filter by Quality Score */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Quality Score Range</span>
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          Quality Score Range
+        </span>
         <select
           value={filters.qualityRange}
           onChange={(e) => updateField('qualityRange', e.target.value)}
@@ -133,14 +167,31 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Filter by Tickets */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Ticket Linkage</span>
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          Ticket Linkage
+        </span>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {[
             { id: 'all', label: 'All' },
             { id: 'true', label: 'Has Filed Tickets' },
             { id: 'false', label: 'No Filed Tickets' },
           ].map((opt) => (
-            <label key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', cursor: 'pointer' }}>
+            <label
+              key={opt.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+              }}
+            >
               <input
                 type="radio"
                 name="hasTickets"
@@ -156,8 +207,21 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       </div>
 
       {/* Toggle by Critical Findings */}
-      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', cursor: 'pointer' }}>
+      <div
+        style={{
+          borderTop: '1px solid var(--border-color)',
+          paddingTop: '16px',
+        }}
+      >
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '0.9rem',
+            cursor: 'pointer',
+          }}
+        >
           <input
             type="checkbox"
             checked={filters.criticalOnly}

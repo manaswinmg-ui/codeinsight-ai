@@ -1,7 +1,8 @@
 from pydantic import BaseModel
+
 from app.repository.file_descriptor import FileDescriptor
-from app.repository.statistics import ScanStatistics
 from app.repository.scan_issue import ScanIssue
+from app.repository.statistics import ScanStatistics
 
 
 class RepositoryManifest(BaseModel):

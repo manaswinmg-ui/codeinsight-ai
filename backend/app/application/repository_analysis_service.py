@@ -30,7 +30,9 @@ logger = logging.getLogger("app.application.repository_analysis")
 class RepositoryAnalysisService:
     """Orchestrates multi-file repository reviews, parallel scanning, and quality metrics aggregation."""
 
-    def __init__(self, processing_svc: ReviewProcessingService = review_processing_service) -> None:
+    def __init__(
+        self, processing_svc: ReviewProcessingService = review_processing_service
+    ) -> None:
         self.processing_svc = processing_svc
 
     async def submit_repository(
@@ -58,9 +60,7 @@ class RepositoryAnalysisService:
         # 3. Create individual Review and FileReview rows
         for sf in scanned_files:
             review = Review(
-                code=sf["content"],
-                language=sf["language"],
-                status=ReviewStatus.PENDING
+                code=sf["content"], language=sf["language"], status=ReviewStatus.PENDING
             )
             db.add(review)
             await db.flush()  # Get review.id
@@ -69,7 +69,7 @@ class RepositoryAnalysisService:
                 repository_id=repo.id,
                 review_id=review.id,
                 file_path=sf["path"],
-                size_bytes=sf["size_bytes"]
+                size_bytes=sf["size_bytes"],
             )
             db.add(file_rev)
 
@@ -80,12 +80,12 @@ class RepositoryAnalysisService:
         background_tasks.add_task(self._run_repository_analysis_task, repo.id)
 
         return RepositoryResponse(
-            repository_id=repo.id,
-            status=repo.status,
-            created_at=repo.created_at
+            repository_id=repo.id, status=repo.status, created_at=repo.created_at
         )
 
-    async def get_repository_detail(self, db: AsyncSession, repo_id: int) -> RepositoryDetailResponse | None:
+    async def get_repository_detail(
+        self, db: AsyncSession, repo_id: int
+    ) -> RepositoryDetailResponse | None:
         """
         Fetch repository, load constituent file reviews and findings, and return a full detail response.
         """
@@ -108,11 +108,20 @@ class RepositoryAnalysisService:
         for fr in repo.file_reviews:
             review = fr.review
             findings_count = len(review.findings) if review and review.findings else 0
-            tickets_count = sum(1 for f in review.findings if f.ticket) if review and review.findings else 0
+            tickets_count = (
+                sum(1 for f in review.findings if f.ticket)
+                if review and review.findings
+                else 0
+            )
 
             # Compute dynamic score
             from app.repositories.review_query_repository import compute_quality_score
-            score = compute_quality_score(review.findings) if review and review.status == ReviewStatus.COMPLETED else 0
+
+            score = (
+                compute_quality_score(review.findings)
+                if review and review.status == ReviewStatus.COMPLETED
+                else 0
+            )
 
             files_list.append(
                 FileReviewResponse(
@@ -122,7 +131,7 @@ class RepositoryAnalysisService:
                     status=review.status if review else "PENDING",
                     quality_score=score,
                     findings_count=findings_count,
-                    tickets_count=tickets_count
+                    tickets_count=tickets_count,
                 )
             )
 
@@ -154,7 +163,7 @@ class RepositoryAnalysisService:
             duration_seconds=duration_seconds,
             files=files_list,
             largest_files=largest_files,
-            most_problematic_files=most_problematic_files
+            most_problematic_files=most_problematic_files,
         )
 
     async def list_repositories(
@@ -182,7 +191,9 @@ class RepositoryAnalysisService:
 
         async with SessionLocal() as db:
             # 1. Transition Repository state to PROCESSING
-            result = await db.execute(select(Repository).filter(Repository.id == repo_id))
+            result = await db.execute(
+                select(Repository).filter(Repository.id == repo_id)
+            )
             repo = result.scalars().first()
             if not repo:
                 logger.error(f"Repository {repo_id} not found in background task.")
@@ -200,9 +211,9 @@ class RepositoryAnalysisService:
             file_reviews = list(fr_result.scalars().all())
 
             # 3. Generate and store embeddings for RAG retrieval
-            from app.ai.router import get_ai_provider
             from app.ai.retrieval import repository_retrieval_service
-            
+            from app.ai.router import get_ai_provider
+
             files_to_embed = [
                 {"path": fr.file_path, "content": fr.review.code}
                 for fr in file_reviews
@@ -210,7 +221,9 @@ class RepositoryAnalysisService:
             ]
             if files_to_embed:
                 provider = get_ai_provider()
-                await repository_retrieval_service.index_repository(db, repo_id, files_to_embed, provider)
+                await repository_retrieval_service.index_repository(
+                    db, repo_id, files_to_embed, provider
+                )
 
         # 3. Process each FileReview concurrently (max 5 concurrent workers)
         sem = asyncio.Semaphore(5)
@@ -224,14 +237,11 @@ class RepositoryAnalysisService:
                     except Exception as err:
                         logger.error(
                             f"Failed to analyze review {review_id} for file_review {fr_id}: {err}",
-                            exc_info=True
+                            exc_info=True,
                         )
 
         # Spawn all worker tasks
-        tasks = [
-            analyze_single_file(fr.id, fr.review_id)
-            for fr in file_reviews
-        ]
+        tasks = [analyze_single_file(fr.id, fr.review_id) for fr in file_reviews]
         await asyncio.gather(*tasks)
 
         # 4. Reload repository and compile summary stats

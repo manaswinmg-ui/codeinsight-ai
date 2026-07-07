@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -95,6 +95,7 @@ async def test_api_get_me_unauthorized(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_api_get_me_success(client: AsyncClient, db_session: AsyncMock) -> None:
     from datetime import UTC, datetime
+
     mock_user = User(
         id=42,
         username="test_me",
@@ -106,13 +107,16 @@ async def test_api_get_me_success(client: AsyncClient, db_session: AsyncMock) ->
         updated_at=datetime.now(UTC),
     )
 
-    with patch(
-        "app.auth.dependencies.token_service.decode_access_token",
-        return_value=42,
-    ), patch(
-        "app.auth.dependencies.user_repository.get",
-        new_callable=AsyncMock,
-    ) as mock_get_user:
+    with (
+        patch(
+            "app.auth.dependencies.token_service.decode_access_token",
+            return_value=42,
+        ),
+        patch(
+            "app.auth.dependencies.user_repository.get",
+            new_callable=AsyncMock,
+        ) as mock_get_user,
+    ):
         mock_get_user.return_value = mock_user
 
         headers = {"Authorization": "Bearer valid_access_token"}
@@ -134,13 +138,16 @@ async def test_api_logout_success(client: AsyncClient) -> None:
         is_active=True,
     )
 
-    with patch(
-        "app.auth.dependencies.token_service.decode_access_token",
-        return_value=42,
-    ), patch(
-        "app.auth.dependencies.user_repository.get",
-        new_callable=AsyncMock,
-    ) as mock_get_user:
+    with (
+        patch(
+            "app.auth.dependencies.token_service.decode_access_token",
+            return_value=42,
+        ),
+        patch(
+            "app.auth.dependencies.user_repository.get",
+            new_callable=AsyncMock,
+        ) as mock_get_user,
+    ):
         mock_get_user.return_value = mock_user
 
         headers = {"Authorization": "Bearer valid_access_token"}

@@ -29,7 +29,15 @@ export const SearchToolbar: React.FC<SearchToolbarProps> = ({
         padding: '16px 24px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexGrow: 1, minWidth: '240px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          flexGrow: 1,
+          minWidth: '240px',
+        }}
+      >
         <span style={{ fontSize: '1.2rem' }}>🔍</span>
         <input
           type="text"
@@ -51,7 +59,9 @@ export const SearchToolbar: React.FC<SearchToolbarProps> = ({
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Sort By:</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            Sort By:
+          </span>
           <select
             value={sortBy}
             onChange={(e) => onSortByChange(e.target.value)}
@@ -79,7 +89,11 @@ export const SearchToolbar: React.FC<SearchToolbarProps> = ({
           <button
             className="btn"
             onClick={onCompare}
-            style={{ padding: '8px 16px', fontSize: '0.9rem', animation: 'pulse 2s infinite' }}
+            style={{
+              padding: '8px 16px',
+              fontSize: '0.9rem',
+              animation: 'pulse 2s infinite',
+            }}
           >
             ⚔️ Compare (2 selected)
           </button>

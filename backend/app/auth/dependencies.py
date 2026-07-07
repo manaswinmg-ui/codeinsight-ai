@@ -34,12 +34,12 @@ async def get_current_user(
     """
     try:
         user_id = ts.decode_access_token(credentials.credentials)
-    except JWTError:
+    except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exc
 
     user = await user_repo.get(db, user_id)
     if user is None:
@@ -57,9 +57,7 @@ async def get_current_user(
 
 
 async def get_optional_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(
-        _bearer_scheme_optional
-    ),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme_optional),
     db: AsyncSession = Depends(get_db),
     ts: TokenService = Depends(lambda: token_service),
     user_repo: UserRepository = Depends(lambda: user_repository),

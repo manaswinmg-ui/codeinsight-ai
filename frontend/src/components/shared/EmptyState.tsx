@@ -31,11 +31,34 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         minHeight: '240px',
       }}
     >
-      <span style={{ fontSize: '3.5rem', marginBottom: '16px', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }}>{icon}</span>
-      <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+      <span
+        style={{
+          fontSize: '3.5rem',
+          marginBottom: '16px',
+          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
+        }}
+      >
+        {icon}
+      </span>
+      <h3
+        style={{
+          margin: '0 0 8px 0',
+          fontSize: '1.25rem',
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+        }}
+      >
         {title}
       </h3>
-      <p style={{ margin: '0 0 24px 0', fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '400px', lineHeight: '1.5' }}>
+      <p
+        style={{
+          margin: '0 0 24px 0',
+          fontSize: '0.9rem',
+          color: 'var(--text-secondary)',
+          maxWidth: '400px',
+          lineHeight: '1.5',
+        }}
+      >
         {description}
       </p>
       {actionLabel && onAction && (

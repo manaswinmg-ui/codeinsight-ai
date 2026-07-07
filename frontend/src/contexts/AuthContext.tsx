@@ -60,10 +60,7 @@ function clearTokens(): void {
   localStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
-async function apiFetch<T>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(url, {
     ...options,
     headers: {

@@ -30,14 +30,19 @@ export function RegisterForm() {
     try {
       await register(username, email, password, fullName || undefined);
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Try a different username/email.');
+      setError(
+        err.message || 'Registration failed. Try a different username/email.'
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+    >
       {error && (
         <div
           className="auth-error"
@@ -58,7 +63,11 @@ export function RegisterForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label
           htmlFor="reg-username"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
           Username <span style={{ color: 'var(--danger-color)' }}>*</span>
         </label>
@@ -66,7 +75,9 @@ export function RegisterForm() {
           id="reg-username"
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
+          onChange={(e) =>
+            setUsername(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))
+          }
           placeholder="username"
           disabled={isSubmitting}
           style={{
@@ -88,7 +99,11 @@ export function RegisterForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label
           htmlFor="reg-fullname"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
           Full Name
         </label>
@@ -117,7 +132,11 @@ export function RegisterForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label
           htmlFor="reg-email"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
           Email Address <span style={{ color: 'var(--danger-color)' }}>*</span>
         </label>
@@ -147,9 +166,14 @@ export function RegisterForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label
           htmlFor="reg-password"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
-          Password <span style={{ color: 'var(--danger-color)' }}>*</span> (min. 8 chars)
+          Password <span style={{ color: 'var(--danger-color)' }}>*</span> (min.
+          8 chars)
         </label>
         <input
           id="reg-password"
@@ -177,9 +201,14 @@ export function RegisterForm() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <label
           htmlFor="reg-confirm-password"
-          style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}
+          style={{
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+          }}
         >
-          Confirm Password <span style={{ color: 'var(--danger-color)' }}>*</span>
+          Confirm Password{' '}
+          <span style={{ color: 'var(--danger-color)' }}>*</span>
         </label>
         <input
           id="reg-confirm-password"

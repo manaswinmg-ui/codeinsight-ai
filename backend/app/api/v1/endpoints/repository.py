@@ -20,9 +20,9 @@ from app.models.user import User
 from app.schemas.repository import (
     RepositoryDetailResponse,
     RepositoryListItemResponse,
-    RepositoryResponse,
     RepositoryQueryRequest,
     RepositoryQueryResponse,
+    RepositoryResponse,
     RepositoryScanResultResponse,
 )
 
@@ -41,7 +41,9 @@ async def upload_repository(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User | None = Depends(get_optional_current_user),
-    app_service: RepositoryAnalysisService = Depends(lambda: repository_analysis_service),
+    app_service: RepositoryAnalysisService = Depends(
+        lambda: repository_analysis_service
+    ),
 ) -> RepositoryResponse:
     """
     Accepts a ZIP archive containing project source files, scans and validates limits,
@@ -50,7 +52,7 @@ async def upload_repository(
     if not file.filename.endswith(".zip"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported file format. Please upload a ZIP archive (.zip)."
+            detail="Unsupported file format. Please upload a ZIP archive (.zip).",
         )
 
     try:
@@ -65,14 +67,13 @@ async def upload_repository(
     except ValueError as val_err:
         logger.warning(f"Validation failed during repository upload: {val_err}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(val_err)
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(val_err)
         )
     except Exception as err:
         logger.error(f"Unexpected error uploading repository: {err}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process repository archive."
+            detail="Failed to process repository archive.",
         )
 
 
@@ -93,12 +94,12 @@ async def scan_repository_upload(
     if not file.filename.endswith(".zip"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported file format. Please upload a ZIP archive (.zip)."
+            detail="Unsupported file format. Please upload a ZIP archive (.zip).",
         )
 
     try:
-        from app.repository.sources.zip_source import ZipRepositorySource
         from app.repository.repository_scanner import RepositoryScanner
+        from app.repository.sources.zip_source import ZipRepositorySource
 
         file_bytes = await file.read()
         source = ZipRepositorySource(file_bytes, file.filename)
@@ -107,19 +108,18 @@ async def scan_repository_upload(
         return RepositoryScanResultResponse(
             manifest=scan_result.manifest,
             tree=scan_result.tree,
-            status=scan_result.status
+            status=scan_result.status,
         )
     except ValueError as val_err:
         logger.warning(f"Validation failed during repository scan: {val_err}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(val_err)
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(val_err)
         )
     except Exception as err:
         logger.error(f"Unexpected error scanning repository: {err}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to scan repository archive."
+            detail="Failed to scan repository archive.",
         )
 
 
@@ -131,7 +131,9 @@ async def scan_repository_upload(
 async def get_repository_detail(
     id: int,
     db: AsyncSession = Depends(get_db),
-    app_service: RepositoryAnalysisService = Depends(lambda: repository_analysis_service),
+    app_service: RepositoryAnalysisService = Depends(
+        lambda: repository_analysis_service
+    ),
 ) -> RepositoryDetailResponse:
     """
     Retrieve repository-level metrics, summary, quality scores, and constituent file reviews.
@@ -141,16 +143,19 @@ async def get_repository_detail(
         if not repo_detail:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Repository review with ID {id} not found."
+                detail=f"Repository review with ID {id} not found.",
             )
         return repo_detail
     except HTTPException:
         raise
     except Exception as err:
-        logger.error(f"Unexpected error fetching repository detail for ID {id}: {err}", exc_info=True)
+        logger.error(
+            f"Unexpected error fetching repository detail for ID {id}: {err}",
+            exc_info=True,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve repository analysis details."
+            detail="Failed to retrieve repository analysis details.",
         )
 
 
@@ -162,7 +167,9 @@ async def list_repositories(
     page: int = 1,
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
-    app_service: RepositoryAnalysisService = Depends(lambda: repository_analysis_service),
+    app_service: RepositoryAnalysisService = Depends(
+        lambda: repository_analysis_service
+    ),
 ) -> dict:
     """
     Retrieve a paginated list of all past repository analyses.
@@ -185,20 +192,20 @@ async def list_repositories(
                     name=repo.name,
                     status=repo.status,
                     overall_quality=repo.overall_quality,
-                    created_at=repo.created_at
+                    created_at=repo.created_at,
                 )
                 for repo in items
             ],
             "total": total,
             "page": page,
             "limit": limit,
-            "pages": pages
+            "pages": pages,
         }
     except Exception as err:
         logger.error(f"Unexpected error listing repositories: {err}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to list repository logs."
+            detail="Failed to list repository logs.",
         )
 
 
@@ -216,9 +223,10 @@ async def query_repository(
     Given a repository ID and user query, perform embedding-based context retrieval
     and call the cost-optimized AI routing layer.
     """
+    from sqlalchemy import select
+
     from app.ai.router import AIRouter
     from app.models.repository import Repository
-    from sqlalchemy import select
 
     # Verify repository exists
     repo_result = await db.execute(select(Repository).filter(Repository.id == id))
@@ -226,7 +234,7 @@ async def query_repository(
     if not repo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Repository review with ID {id} not found."
+            detail=f"Repository review with ID {id} not found.",
         )
 
     try:
@@ -238,11 +246,11 @@ async def query_repository(
             cost=result["cost"],
             escalated=result["escalated"],
             reason=result["reason"],
-            files_retrieved=result["files_retrieved"]
+            files_retrieved=result["files_retrieved"],
         )
     except Exception as err:
         logger.error(f"Error querying repository {id}: {err}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to run query on repository."
+            detail="Failed to run query on repository.",
         )

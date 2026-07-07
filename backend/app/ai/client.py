@@ -48,7 +48,7 @@ class MockAIClient(AIClient):
                         "result = ast.literal_eval(user_input)"
                     ),
                     "estimated_fix_time": "20 minutes",
-                    "test_case_hint": "Test with malicious input like '__import__(\"os\").system(\"rm -rf /\")' to confirm it is rejected.",
+                    "test_case_hint": 'Test with malicious input like \'__import__("os").system("rm -rf /")\' to confirm it is rejected.',
                     "references": [
                         "https://owasp.org/www-project-top-ten/",
                         "https://docs.python.org/3/library/ast.html#ast.literal_eval",
@@ -91,8 +91,8 @@ class MockAIClient(AIClient):
                     ),
                     "suggested_fix": "Use parameterized queries or an ORM instead of string interpolation.",
                     "improved_code": (
-                        "# Instead of: query = f\"SELECT * FROM users WHERE id = {user_id}\"\n"
-                        "cursor.execute(\"SELECT * FROM users WHERE id = %s\", (user_id,))"
+                        '# Instead of: query = f"SELECT * FROM users WHERE id = {user_id}"\n'
+                        'cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))'
                     ),
                     "estimated_fix_time": "15 minutes",
                     "test_case_hint": "Test with input containing SQL metacharacters: ' OR 1=1 --",
@@ -182,7 +182,12 @@ class MockAIClient(AIClient):
                     next_stripped = lines[j].strip()
                     if not next_stripped:
                         continue
-                    if next_stripped.startswith('"""') or next_stripped.startswith("'''") or next_stripped.startswith('"') or next_stripped.startswith("'"):
+                    if (
+                        next_stripped.startswith('"""')
+                        or next_stripped.startswith("'''")
+                        or next_stripped.startswith('"')
+                        or next_stripped.startswith("'")
+                    ):
                         has_docstring = True
                     break
                 if not has_docstring:
@@ -228,7 +233,6 @@ class MockAIClient(AIClient):
     def _detect_long_functions(lines: list[str]) -> dict | None:
         """Detect functions longer than 30 lines."""
         func_start = None
-        func_indent = 0
         for i, line in enumerate(lines):
             stripped = line.strip()
             if stripped.startswith("def ") or stripped.startswith("async def "):
@@ -264,7 +268,7 @@ class MockAIClient(AIClient):
                             "line_end": i,
                         }
                 func_start = i
-                func_indent = len(line) - len(line.lstrip())
+                len(line) - len(line.lstrip())
 
         # Check last function
         if func_start is not None:
@@ -287,7 +291,9 @@ class MockAIClient(AIClient):
                     "improved_code": None,
                     "estimated_fix_time": "30 minutes",
                     "test_case_hint": "Each extracted function should be independently testable.",
-                    "references": ["Clean Code by Robert C. Martin — Chapter 3: Functions"],
+                    "references": [
+                        "Clean Code by Robert C. Martin — Chapter 3: Functions"
+                    ],
                     "line_start": func_start + 1,
                     "line_end": len(lines),
                 }
@@ -387,7 +393,9 @@ class MockAIClient(AIClient):
         """Detect functions that accept parameters without any validation."""
         for i, line in enumerate(lines):
             stripped = line.strip()
-            if (stripped.startswith("def ") or stripped.startswith("async def ")) and "(" in stripped:
+            if (
+                stripped.startswith("def ") or stripped.startswith("async def ")
+            ) and "(" in stripped:
                 # Check for parameters (not just self/cls)
                 params_match = re.search(r"\((.*?)\)", stripped)
                 if params_match:
@@ -402,7 +410,17 @@ class MockAIClient(AIClient):
                         has_validation = False
                         for j in range(i + 1, min(i + 12, len(lines))):
                             check = lines[j].strip()
-                            if any(kw in check for kw in ["if not ", "isinstance(", "raise ", "assert ", "validate", ".strip()"]):
+                            if any(
+                                kw in check
+                                for kw in [
+                                    "if not ",
+                                    "isinstance(",
+                                    "raise ",
+                                    "assert ",
+                                    "validate",
+                                    ".strip()",
+                                ]
+                            ):
                                 has_validation = True
                                 break
                         if not has_validation:
@@ -478,28 +496,30 @@ class MockAIClient(AIClient):
 
         # If no patterns detected, return a positive review with one info finding
         if not findings:
-            findings.append({
-                "title": "Clean Code — No Major Issues Detected",
-                "description": (
-                    "The submitted code follows good practices. No bugs, security "
-                    "vulnerabilities, or significant maintainability issues were detected."
-                ),
-                "severity": "info",
-                "category": "BEST_PRACTICE",
-                "confidence": random.randint(80, 95),
-                "impact": "No negative impact — the code is well-structured.",
-                "why_it_matters": (
-                    "Writing clean code from the start reduces technical debt and "
-                    "lowers the long-term cost of maintenance."
-                ),
-                "suggested_fix": None,
-                "improved_code": None,
-                "estimated_fix_time": None,
-                "test_case_hint": "Continue writing comprehensive tests to maintain this quality.",
-                "references": [],
-                "line_start": None,
-                "line_end": None,
-            })
+            findings.append(
+                {
+                    "title": "Clean Code — No Major Issues Detected",
+                    "description": (
+                        "The submitted code follows good practices. No bugs, security "
+                        "vulnerabilities, or significant maintainability issues were detected."
+                    ),
+                    "severity": "info",
+                    "category": "BEST_PRACTICE",
+                    "confidence": random.randint(80, 95),
+                    "impact": "No negative impact — the code is well-structured.",
+                    "why_it_matters": (
+                        "Writing clean code from the start reduces technical debt and "
+                        "lowers the long-term cost of maintenance."
+                    ),
+                    "suggested_fix": None,
+                    "improved_code": None,
+                    "estimated_fix_time": None,
+                    "test_case_hint": "Continue writing comprehensive tests to maintain this quality.",
+                    "references": [],
+                    "line_start": None,
+                    "line_end": None,
+                }
+            )
 
         # Compute quality score based on findings
         deductions = {"critical": 20, "high": 15, "medium": 10, "low": 5, "info": 2}

@@ -1,12 +1,14 @@
 import logging
+
 import httpx
+
 from app.ai.providers.base import (
-    AIProvider,
     AIAuthenticationError,
-    AIRateLimitError,
-    AITimeoutError,
     AIConnectionError,
     AIError,
+    AIProvider,
+    AIRateLimitError,
+    AITimeoutError,
 )
 from app.config import settings
 
@@ -63,14 +65,27 @@ class OpenAIProvider(AIProvider):
                 elif response.status_code == 429:
                     raise AIRateLimitError("OpenAI rate limit exceeded")
                 else:
-                    raise AIError(f"OpenAI API returned status code {response.status_code}: {response.text}")
+                    raise AIError(
+                        f"OpenAI API returned status code {response.status_code}: {response.text}"
+                    )
 
         except httpx.TimeoutException as err:
             raise AITimeoutError("OpenAI request timed out") from err
         except httpx.RequestError as err:
-            raise AIConnectionError(f"OpenAI network connection failed: {str(err)}") from err
+            raise AIConnectionError(
+                f"OpenAI network connection failed: {str(err)}"
+            ) from err
         except Exception as err:
-            if isinstance(err, (AIAuthenticationError, AIRateLimitError, AITimeoutError, AIConnectionError, AIError)):
+            if isinstance(
+                err,
+                (
+                    AIAuthenticationError,
+                    AIRateLimitError,
+                    AITimeoutError,
+                    AIConnectionError,
+                    AIError,
+                ),
+            ):
                 raise err
             raise AIError(f"Unexpected OpenAI execution exception: {str(err)}") from err
 
@@ -105,16 +120,31 @@ class OpenAIProvider(AIProvider):
                 elif response.status_code == 429:
                     raise AIRateLimitError("OpenAI rate limit exceeded")
                 else:
-                    raise AIError(f"OpenAI API returned status code {response.status_code}: {response.text}")
+                    raise AIError(
+                        f"OpenAI API returned status code {response.status_code}: {response.text}"
+                    )
 
         except httpx.TimeoutException as err:
             raise AITimeoutError("OpenAI request timed out") from err
         except httpx.RequestError as err:
-            raise AIConnectionError(f"OpenAI network connection failed: {str(err)}") from err
+            raise AIConnectionError(
+                f"OpenAI network connection failed: {str(err)}"
+            ) from err
         except Exception as err:
-            if isinstance(err, (AIAuthenticationError, AIRateLimitError, AITimeoutError, AIConnectionError, AIError)):
+            if isinstance(
+                err,
+                (
+                    AIAuthenticationError,
+                    AIRateLimitError,
+                    AITimeoutError,
+                    AIConnectionError,
+                    AIError,
+                ),
+            ):
                 raise err
-            raise AIError(f"Unexpected OpenAI embedding execution exception: {str(err)}") from err
+            raise AIError(
+                f"Unexpected OpenAI embedding execution exception: {str(err)}"
+            ) from err
 
     def estimate_tokens(self, text: str) -> int:
         if not text:

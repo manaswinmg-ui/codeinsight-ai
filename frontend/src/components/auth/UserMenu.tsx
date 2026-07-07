@@ -8,7 +8,10 @@ export function UserMenu() {
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -26,7 +29,10 @@ export function UserMenu() {
     .toUpperCase();
 
   return (
-    <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div
+      ref={dropdownRef}
+      style={{ position: 'relative', display: 'inline-block' }}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -71,10 +77,19 @@ export function UserMenu() {
         >
           {initials}
         </div>
-        <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span
+          style={{
+            maxWidth: '120px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {user.full_name || user.username}
         </span>
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{isOpen ? '▲' : '▼'}</span>
+        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+          {isOpen ? '▲' : '▼'}
+        </span>
       </button>
 
       {isOpen && (
@@ -91,15 +106,33 @@ export function UserMenu() {
             flexDirection: 'column',
             gap: '12px',
             borderRadius: '12px',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+            boxShadow:
+              '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
             transform: 'none',
           }}
         >
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+          <div
+            style={{
+              borderBottom: '1px solid var(--border-color)',
+              paddingBottom: '12px',
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                color: 'var(--text-primary)',
+              }}
+            >
               {user.full_name || user.username}
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            <div
+              style={{
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                marginTop: '2px',
+              }}
+            >
               @{user.username}
             </div>
             <div

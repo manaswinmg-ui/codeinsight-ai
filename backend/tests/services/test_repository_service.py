@@ -85,7 +85,9 @@ def test_repository_summary_aggregation():
     finding2 = Finding(severity="medium", ticket=None)
     finding3 = Finding(severity="low", ticket=None)
 
-    review1 = Review(language="python", status="COMPLETED", findings=[finding1, finding2])
+    review1 = Review(
+        language="python", status="COMPLETED", findings=[finding1, finding2]
+    )
     review2 = Review(language="javascript", status="COMPLETED", findings=[finding3])
     review3 = Review(language="python", status="PENDING", findings=[])
 
@@ -114,10 +116,11 @@ async def test_repository_submit():
     bg_tasks = MagicMock()
 
     from datetime import UTC, datetime
+
     def add_side_effect(obj):
-        if hasattr(obj, 'id') and obj.id is None:
+        if hasattr(obj, "id") and obj.id is None:
             obj.id = 1
-        if hasattr(obj, 'created_at') and obj.created_at is None:
+        if hasattr(obj, "created_at") and obj.created_at is None:
             obj.created_at = datetime.now(UTC)
 
     db.add.side_effect = add_side_effect
@@ -128,10 +131,7 @@ async def test_repository_submit():
     service = RepositoryAnalysisService()
 
     response = await service.submit_repository(
-        db,
-        name="test_repo.zip",
-        file_bytes=zip_bytes,
-        background_tasks=bg_tasks
+        db, name="test_repo.zip", file_bytes=zip_bytes, background_tasks=bg_tasks
     )
 
     assert response.status == ReviewStatus.PENDING

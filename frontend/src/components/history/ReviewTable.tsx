@@ -51,7 +51,14 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
   return (
     <div className="glass-card" style={{ padding: '20px', minWidth: 0 }}>
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            textAlign: 'left',
+            minWidth: '700px',
+          }}
+        >
           <thead>
             <tr
               style={{
@@ -68,7 +75,9 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
               <th style={{ padding: '12px 8px' }}>Quality Score</th>
               <th style={{ padding: '12px 8px' }}>Findings</th>
               <th style={{ padding: '12px 8px' }}>Tickets</th>
-              <th style={{ padding: '12px 8px', textAlign: 'right' }}>Actions</th>
+              <th style={{ padding: '12px 8px', textAlign: 'right' }}>
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -92,10 +101,16 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
                       checked={isChecked}
                       disabled={isDisabled}
                       onChange={() => onToggleSelect(rev.id)}
-                      style={{ cursor: isDisabled ? 'not-allowed' : 'pointer', width: '16px', height: '16px' }}
+                      style={{
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        width: '16px',
+                        height: '16px',
+                      }}
                     />
                   </td>
-                  <td style={{ padding: '12px 8px', fontWeight: 600 }}>#{rev.id}</td>
+                  <td style={{ padding: '12px 8px', fontWeight: 600 }}>
+                    #{rev.id}
+                  </td>
                   <td style={{ padding: '12px 8px' }}>
                     <span
                       style={{
@@ -108,7 +123,13 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
                       {rev.language}
                     </span>
                   </td>
-                  <td style={{ padding: '12px 8px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  <td
+                    style={{
+                      padding: '12px 8px',
+                      color: 'var(--text-secondary)',
+                      fontSize: '0.85rem',
+                    }}
+                  >
                     {new Date(rev.created_at).toLocaleString()}
                   </td>
                   <td style={{ padding: '12px 8px' }}>
@@ -150,8 +171,12 @@ export const ReviewTable: React.FC<ReviewTableProps> = ({
                       {rev.quality_score}%
                     </span>
                   </td>
-                  <td style={{ padding: '12px 8px' }}>{rev.findings_count} finding(s)</td>
-                  <td style={{ padding: '12px 8px' }}>{rev.open_tickets_count} open</td>
+                  <td style={{ padding: '12px 8px' }}>
+                    {rev.findings_count} finding(s)
+                  </td>
+                  <td style={{ padding: '12px 8px' }}>
+                    {rev.open_tickets_count} open
+                  </td>
                   <td style={{ padding: '12px 8px', textAlign: 'right' }}>
                     <button
                       className="btn"

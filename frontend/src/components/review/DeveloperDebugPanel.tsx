@@ -5,7 +5,9 @@ interface DeveloperDebugPanelProps {
   reviewData: ReviewDetail;
 }
 
-export const DeveloperDebugPanel: React.FC<DeveloperDebugPanelProps> = ({ reviewData }) => {
+export const DeveloperDebugPanel: React.FC<DeveloperDebugPanelProps> = ({
+  reviewData,
+}) => {
   const simulatedPrompt = `System: You are an expert code reviewer. Analyze the following code for bugs, performance bottlenecks, readability, maintainability, style, and security concerns.
 Language: ${reviewData.language}
 Source Code:
@@ -25,11 +27,17 @@ Respond strictly in JSON format.`;
 
   const mergedJSON = JSON.stringify(reviewData.findings, null, 2);
 
-  const simulatedStaticAnalysis = `[RUFF CHECK] Found ${reviewData.findings.filter(f => f.category?.toLowerCase() === 'style' || f.category?.toLowerCase() === 'best_practice').length} violations.
+  const simulatedStaticAnalysis = `[RUFF CHECK] Found ${reviewData.findings.filter((f) => f.category?.toLowerCase() === 'style' || f.category?.toLowerCase() === 'best_practice').length} violations.
 - L4: E401 Multiple imports on one line
 - L12: F841 Local variable 'x' is assigned to but never used`;
 
-  const DebugSection = ({ title, content }: { title: string; content: string }) => (
+  const DebugSection = ({
+    title,
+    content,
+  }: {
+    title: string;
+    content: string;
+  }) => (
     <div
       style={{
         display: 'flex',
@@ -82,16 +90,28 @@ Respond strictly in JSON format.`;
           fontWeight: 600,
         }}
       >
-        🛠️ Developer mode is active. Showing raw engine execution telemetry and LLM prompts.
+        🛠️ Developer mode is active. Showing raw engine execution telemetry and
+        LLM prompts.
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        <DebugSection title="System Prompt Template" content={simulatedPrompt} />
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}
+      >
+        <DebugSection
+          title="System Prompt Template"
+          content={simulatedPrompt}
+        />
         <DebugSection title="Raw AI Response" content={simulatedRawResponse} />
       </div>
 
-      <DebugSection title="Merged Findings (Unified schema JSON)" content={mergedJSON} />
-      <DebugSection title="Static Analysis Output (Ruff logs)" content={simulatedStaticAnalysis} />
+      <DebugSection
+        title="Merged Findings (Unified schema JSON)"
+        content={mergedJSON}
+      />
+      <DebugSection
+        title="Static Analysis Output (Ruff logs)"
+        content={simulatedStaticAnalysis}
+      />
     </div>
   );
 };

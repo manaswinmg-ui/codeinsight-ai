@@ -163,12 +163,15 @@ async def test_update_ticket_status_invalid_transition(client: AsyncClient) -> N
         "app.application.ticket_application_service.TicketApplicationService.update_ticket_status",
         new_callable=AsyncMock,
     ) as mock_update:
-        mock_update.side_effect = InvalidStatusTransitionError("Cannot transition from CLOSED to IN_PROGRESS")
+        mock_update.side_effect = InvalidStatusTransitionError(
+            "Cannot transition from CLOSED to IN_PROGRESS"
+        )
 
         response = await client.patch(
             "/api/v1/tickets/456/status",
             json={"status": "IN_PROGRESS"},
         )
         assert response.status_code == 422
-        assert "Cannot transition from CLOSED to IN_PROGRESS" in response.json()["detail"]
-
+        assert (
+            "Cannot transition from CLOSED to IN_PROGRESS" in response.json()["detail"]
+        )

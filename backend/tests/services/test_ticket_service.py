@@ -47,7 +47,9 @@ async def test_create_ticket_from_finding_success() -> None:
     mock_ticket_repo.get_by_finding_id = AsyncMock(return_value=None)
     mock_ticket_repo.create = AsyncMock(side_effect=lambda db, ticket: ticket)
 
-    service = TicketService(finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo)
+    service = TicketService(
+        finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo
+    )
 
     db = AsyncMock()
     ticket = await service.create_ticket_from_finding(db, 123)
@@ -70,7 +72,9 @@ async def test_create_ticket_from_finding_not_found() -> None:
 
     mock_ticket_repo = MagicMock()
 
-    service = TicketService(finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo)
+    service = TicketService(
+        finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo
+    )
 
     db = AsyncMock()
     with pytest.raises(FindingNotFoundError) as exc_info:
@@ -98,7 +102,9 @@ async def test_create_ticket_from_finding_already_exists() -> None:
     mock_ticket_repo = MagicMock()
     mock_ticket_repo.get_by_finding_id = AsyncMock(return_value=mock_ticket)
 
-    service = TicketService(finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo)
+    service = TicketService(
+        finding_repo=mock_finding_repo, ticket_repo=mock_ticket_repo
+    )
 
     db = AsyncMock()
     with pytest.raises(TicketAlreadyExistsError) as exc_info:
@@ -123,7 +129,9 @@ async def test_validate_and_update_status_success() -> None:
     db = AsyncMock()
     db.add = MagicMock()
 
-    updated = await service.validate_and_update_status(db, 456, TicketStatus.IN_PROGRESS)
+    updated = await service.validate_and_update_status(
+        db, 456, TicketStatus.IN_PROGRESS
+    )
     assert updated.status == TicketStatus.IN_PROGRESS
     assert updated.resolved_at is None
 
@@ -164,9 +172,11 @@ async def test_validate_and_update_status_resolution_notes() -> None:
     db.add = MagicMock()
 
     updated = await service.validate_and_update_status(
-        db, 456, TicketStatus.DONE, resolution_notes="Fixed SQL injection using parameterized query"
+        db,
+        456,
+        TicketStatus.DONE,
+        resolution_notes="Fixed SQL injection using parameterized query",
     )
     assert updated.status == TicketStatus.DONE
     assert updated.resolved_at is not None
     assert updated.resolution_notes == "Fixed SQL injection using parameterized query"
-

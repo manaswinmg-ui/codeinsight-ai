@@ -16,12 +16,12 @@ async def test_get_dashboard_metrics_api(client: AsyncClient) -> None:
         open_tickets=2,
         critical_findings=1,
         average_quality=92.0,
-        language_distribution={"python": 5}
+        language_distribution={"python": 5},
     )
 
     with patch(
         "app.application.dashboard_application_service.DashboardApplicationService.get_dashboard_metrics",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get:
         mock_get.return_value = mock_metrics
 
@@ -42,12 +42,12 @@ async def test_get_recent_reviews_api(client: AsyncClient) -> None:
         created_at=datetime.now(UTC),
         quality_score=95,
         findings_count=1,
-        open_tickets_count=0
+        open_tickets_count=0,
     )
 
     with patch(
         "app.application.dashboard_application_service.DashboardApplicationService.get_recent_reviews",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get:
         mock_get.return_value = [mock_item]
 
@@ -67,12 +67,12 @@ async def test_get_recent_tickets_api(client: AsyncClient) -> None:
         status="OPEN",
         title="Unused import",
         review_id=10,
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
 
     with patch(
         "app.application.dashboard_application_service.DashboardApplicationService.get_recent_tickets",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_get:
         mock_get.return_value = [mock_item]
 
@@ -93,19 +93,15 @@ async def test_search_reviews_api(client: AsyncClient) -> None:
         created_at=datetime.now(UTC),
         quality_score=95,
         findings_count=1,
-        open_tickets_count=0
+        open_tickets_count=0,
     )
     mock_response = PaginatedResponse[ReviewSummary](
-        items=[mock_item],
-        total=1,
-        page=1,
-        limit=10,
-        pages=1
+        items=[mock_item], total=1, page=1, limit=10, pages=1
     )
 
     with patch(
         "app.application.review_history_application_service.ReviewHistoryApplicationService.search_reviews",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_search:
         mock_search.return_value = mock_response
 
@@ -126,12 +122,12 @@ async def test_compare_reviews_api(client: AsyncClient) -> None:
         new_findings=[],
         resolved_findings=[],
         critical_fixed_count=0,
-        tickets_closed_count=0
+        tickets_closed_count=0,
     )
 
     with patch(
         "app.application.review_history_application_service.ReviewHistoryApplicationService.compare_reviews",
-        new_callable=AsyncMock
+        new_callable=AsyncMock,
     ) as mock_compare:
         mock_compare.return_value = mock_response
 

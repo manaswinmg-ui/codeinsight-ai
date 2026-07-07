@@ -23,7 +23,7 @@ async def test_search_reviews_success() -> None:
         language="python",
         status=ReviewStatus.COMPLETED,
         findings=[],
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
 
     mock_rev_repo.search = AsyncMock(return_value=([(r, 100)], 1))
@@ -48,8 +48,22 @@ async def test_compare_reviews_success() -> None:
     mock_rev_repo = MagicMock()
 
     # Left Review (older): findings are f1, f2
-    f1 = Finding(id=10, review_id=1, title="SQL Injection", description="Raw SQL execution", severity="critical", line_start=15)
-    f2 = Finding(id=11, review_id=1, title="Unused import", description="import os is unused", severity="low", line_start=2)
+    f1 = Finding(
+        id=10,
+        review_id=1,
+        title="SQL Injection",
+        description="Raw SQL execution",
+        severity="critical",
+        line_start=15,
+    )
+    f2 = Finding(
+        id=11,
+        review_id=1,
+        title="Unused import",
+        description="import os is unused",
+        severity="low",
+        line_start=2,
+    )
 
     # Simulate an open ticket for left finding f1
     t1 = Ticket(id=20, priority=TicketPriority.P1, status=TicketStatus.OPEN, finding=f1)
@@ -59,12 +73,28 @@ async def test_compare_reviews_success() -> None:
 
     # Right Review (newer): f1 is resolved (not present), f2 is still present (unused import), and f3 is newly added
     # We will map matching using lines and descriptions
-    f2_new = Finding(id=12, review_id=2, title="Unused import", description="import os is unused", severity="low", line_start=2)
-    f3 = Finding(id=13, review_id=2, title="Hardcoded Password", description="Password is exposed", severity="high", line_start=30)
+    f2_new = Finding(
+        id=12,
+        review_id=2,
+        title="Unused import",
+        description="import os is unused",
+        severity="low",
+        line_start=2,
+    )
+    f3 = Finding(
+        id=13,
+        review_id=2,
+        title="Hardcoded Password",
+        description="Password is exposed",
+        severity="high",
+        line_start=30,
+    )
 
     right_review = Review(id=2, findings=[f2_new, f3])
 
-    mock_rev_repo.get_review_with_findings_and_tickets = AsyncMock(side_effect=lambda db, rid: left_review if rid == 1 else right_review)
+    mock_rev_repo.get_review_with_findings_and_tickets = AsyncMock(
+        side_effect=lambda db, rid: left_review if rid == 1 else right_review
+    )
     service = ReviewHistoryApplicationService(review_query_repo=mock_rev_repo)
 
     # Act

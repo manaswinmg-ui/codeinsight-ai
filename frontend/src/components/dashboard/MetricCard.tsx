@@ -19,16 +19,43 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   trend,
 }) => {
   return (
-    <div className="glass-card" style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
+    <div
+      className="glass-card"
+      style={{
+        flex: '1 1 200px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+          }}
+        >
           {title}
         </span>
         <span style={{ fontSize: '1.5rem', opacity: 0.85 }}>{icon}</span>
       </div>
       <div style={{ fontSize: '2rem', fontWeight: 800 }}>{value}</div>
       {trend && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.85rem',
+          }}
+        >
           <span
             style={{
               color:

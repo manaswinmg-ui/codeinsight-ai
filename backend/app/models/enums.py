@@ -42,4 +42,3 @@ class TicketStatus(StrEnum):
     IN_REVIEW = "IN_REVIEW"
     DONE = "DONE"
     CLOSED = "CLOSED"
-

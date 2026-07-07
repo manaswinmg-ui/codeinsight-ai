@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -25,18 +26,36 @@ class FindingResponse(BaseModel):
     description: str = Field(..., description="Detailed description of the issue")
     severity: str = Field(..., description="Severity level")
     status: str = Field(..., description="Current state of the finding")
-    suggested_fix: str | None = Field(default=None, description="Suggested fix code snippet")
+    suggested_fix: str | None = Field(
+        default=None, description="Suggested fix code snippet"
+    )
     test_case_hint: str | None = Field(default=None, description="Test case scenario")
     # Enhanced engineering metadata
-    category: str | None = Field(default=None, description="Engineering category of the finding")
-    confidence: int | None = Field(default=None, description="AI confidence score 0–100")
-    impact: str | None = Field(default=None, description="Short description of potential impact")
-    why_it_matters: str | None = Field(default=None, description="Educational explanation")
+    category: str | None = Field(
+        default=None, description="Engineering category of the finding"
+    )
+    confidence: int | None = Field(
+        default=None, description="AI confidence score 0–100"
+    )
+    impact: str | None = Field(
+        default=None, description="Short description of potential impact"
+    )
+    why_it_matters: str | None = Field(
+        default=None, description="Educational explanation"
+    )
     improved_code: str | None = Field(default=None, description="Improved code snippet")
-    estimated_fix_time: str | None = Field(default=None, description="Estimated time to fix")
-    references: list[str] | None = Field(default=None, description="Reference links or names")
-    line_start: int | None = Field(default=None, description="Start line number in source code")
-    line_end: int | None = Field(default=None, description="End line number in source code")
+    estimated_fix_time: str | None = Field(
+        default=None, description="Estimated time to fix"
+    )
+    references: list[str] | None = Field(
+        default=None, description="Reference links or names"
+    )
+    line_start: int | None = Field(
+        default=None, description="Start line number in source code"
+    )
+    line_end: int | None = Field(
+        default=None, description="End line number in source code"
+    )
     ticket_id: int | None = Field(default=None, description="Associated bug ticket ID")
 
     class Config:
@@ -70,7 +89,7 @@ class ReviewListItemResponse(BaseModel):
         from_attributes = True
 
 
-from typing import Generic, Literal, TypeVar
+
 
 T = TypeVar("T")
 
@@ -93,7 +112,14 @@ class ReviewSearchQuery(BaseModel):
     quality_max: int | None = None
     critical_only: bool = False
     has_tickets: bool | None = None
-    sort_by: Literal["newest", "oldest", "highest_quality", "lowest_quality", "most_findings", "least_findings"] = "newest"
+    sort_by: Literal[
+        "newest",
+        "oldest",
+        "highest_quality",
+        "lowest_quality",
+        "most_findings",
+        "least_findings",
+    ] = "newest"
 
 
 class ReviewCompareRequest(BaseModel):
@@ -117,4 +143,3 @@ class ReviewComparisonResponse(BaseModel):
     resolved_findings: list[FindingComparisonItem]
     critical_fixed_count: int
     tickets_closed_count: int
-

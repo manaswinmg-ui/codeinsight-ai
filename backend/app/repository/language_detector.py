@@ -34,5 +34,6 @@ class LanguageDetector:
         Returns None if the extension is not supported.
         """
         import os
+
         _, ext = os.path.splitext(filename.lower())
         return cls._EXTENSION_MAP.get(ext)

@@ -10,10 +10,19 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
       <div className="auth-card glass-card">
         <div className="auth-header">
           <span style={{ fontSize: '2.5rem' }}>🔍</span>
-          <h1 className="gradient-text" style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}>
+          <h1
+            className="gradient-text"
+            style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}
+          >
             CodeInsight AI
           </h1>
-          <p style={{ color: 'var(--text-secondary)', margin: '4px 0 0', fontSize: '0.9rem' }}>
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              margin: '4px 0 0',
+              fontSize: '0.9rem',
+            }}
+          >
             Create your account
           </p>
         </div>

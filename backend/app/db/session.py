@@ -13,10 +13,7 @@ if not settings.DATABASE_URL.startswith("sqlite"):
     engine_args["max_overflow"] = 10
     engine_args["pool_pre_ping"] = True
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    **engine_args
-)
+engine = create_async_engine(settings.DATABASE_URL, **engine_args)
 
 # Async session factory
 SessionLocal = async_sessionmaker(

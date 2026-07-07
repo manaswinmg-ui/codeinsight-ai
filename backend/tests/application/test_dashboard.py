@@ -16,20 +16,19 @@ async def test_get_dashboard_metrics_success() -> None:
     mock_rev_repo = MagicMock()
     mock_tkt_repo = MagicMock()
 
-    mock_rev_repo.get_metrics = AsyncMock(return_value={
-        "reviews_count": 10,
-        "completed_reviews": 8,
-        "critical_findings": 2,
-        "average_quality": 84.5,
-        "language_distribution": {"python": 7, "javascript": 3}
-    })
-    mock_tkt_repo.get_metrics = AsyncMock(return_value={
-        "open_tickets": 4
-    })
+    mock_rev_repo.get_metrics = AsyncMock(
+        return_value={
+            "reviews_count": 10,
+            "completed_reviews": 8,
+            "critical_findings": 2,
+            "average_quality": 84.5,
+            "language_distribution": {"python": 7, "javascript": 3},
+        }
+    )
+    mock_tkt_repo.get_metrics = AsyncMock(return_value={"open_tickets": 4})
 
     service = DashboardApplicationService(
-        review_query_repo=mock_rev_repo,
-        ticket_query_repo=mock_tkt_repo
+        review_query_repo=mock_rev_repo, ticket_query_repo=mock_tkt_repo
     )
 
     # Act
@@ -53,18 +52,10 @@ async def test_get_recent_reviews_success() -> None:
 
     # Mock Findings & Review
     f1 = Finding(
-        id=1,
-        title="Issue 1",
-        description="desc",
-        severity="critical",
-        status="OPEN"
+        id=1, title="Issue 1", description="desc", severity="critical", status="OPEN"
     )
     f2 = Finding(
-        id=2,
-        title="Issue 2",
-        description="desc",
-        severity="low",
-        status="OPEN"
+        id=2, title="Issue 2", description="desc", severity="low", status="OPEN"
     )
 
     # Mock ticket for f1
@@ -73,7 +64,7 @@ async def test_get_recent_reviews_success() -> None:
         priority=TicketPriority.P1,
         status=TicketStatus.OPEN,
         title="Ticket title",
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
     f1.ticket = t1
 
@@ -82,14 +73,13 @@ async def test_get_recent_reviews_success() -> None:
         language="python",
         status=ReviewStatus.COMPLETED,
         findings=[f1, f2],
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
 
     mock_rev_repo.get_recent_reviews = AsyncMock(return_value=[r1])
 
     service = DashboardApplicationService(
-        review_query_repo=mock_rev_repo,
-        ticket_query_repo=mock_tkt_repo
+        review_query_repo=mock_rev_repo, ticket_query_repo=mock_tkt_repo
     )
 
     # Act
@@ -120,14 +110,13 @@ async def test_get_recent_tickets_success() -> None:
         status=TicketStatus.OPEN,
         title="SQL Injection",
         finding=f,
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
 
     mock_tkt_repo.get_recent_tickets = AsyncMock(return_value=[t])
 
     service = DashboardApplicationService(
-        review_query_repo=mock_rev_repo,
-        ticket_query_repo=mock_tkt_repo
+        review_query_repo=mock_rev_repo, ticket_query_repo=mock_tkt_repo
     )
 
     # Act

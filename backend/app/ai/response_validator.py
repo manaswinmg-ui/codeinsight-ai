@@ -8,8 +8,15 @@ class AIResponseValidationError(ValueError):
 
 
 VALID_CATEGORIES = {
-    "BUG", "SECURITY", "PERFORMANCE", "MAINTAINABILITY",
-    "READABILITY", "RELIABILITY", "BEST_PRACTICE", "DOCUMENTATION", "UNKNOWN",
+    "BUG",
+    "SECURITY",
+    "PERFORMANCE",
+    "MAINTAINABILITY",
+    "READABILITY",
+    "RELIABILITY",
+    "BEST_PRACTICE",
+    "DOCUMENTATION",
+    "UNKNOWN",
 }
 
 
@@ -116,4 +123,3 @@ class ResponseValidator:
             raise AIResponseValidationError(
                 f"Finding[{index}].references must be a list if present"
             )
-

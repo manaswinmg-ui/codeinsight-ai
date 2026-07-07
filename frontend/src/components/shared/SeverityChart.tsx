@@ -7,10 +7,10 @@ interface SeverityChartProps {
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: '#e879f9',
-  high:     '#f87171',
-  medium:   '#fbbf24',
-  low:      '#60a5fa',
-  info:     '#34d399',
+  high: '#f87171',
+  medium: '#fbbf24',
+  low: '#60a5fa',
+  info: '#34d399',
 };
 
 export const SeverityChart: React.FC<SeverityChartProps> = ({ findings }) => {
@@ -21,7 +21,10 @@ export const SeverityChart: React.FC<SeverityChartProps> = ({ findings }) => {
       acc[sev] = (acc[sev] || 0) + 1;
       return acc;
     },
-    { critical: 0, high: 0, medium: 0, low: 0, info: 0 } as Record<string, number>
+    { critical: 0, high: 0, medium: 0, low: 0, info: 0 } as Record<
+      string,
+      number
+    >
   );
 
   const total = findings.length;

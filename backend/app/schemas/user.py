@@ -37,8 +37,10 @@ class UserResponse(UserInDBBase):
 
 # ─── Auth Request / Response Schemas ──────────────────────────────────
 
+
 class UserRegisterRequest(BaseModel):
     """Registration request payload."""
+
     username: str = Field(
         ..., min_length=3, max_length=150, pattern=r"^[a-zA-Z0-9_-]+$"
     )
@@ -49,12 +51,14 @@ class UserRegisterRequest(BaseModel):
 
 class UserLoginRequest(BaseModel):
     """Login request payload."""
+
     email: EmailStr
     password: str
 
 
 class UserPublicResponse(BaseModel):
     """Minimal user info returned inside auth token responses."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -64,6 +68,7 @@ class UserPublicResponse(BaseModel):
 
 class AuthTokenResponse(BaseModel):
     """Response containing access and refresh tokens after login/register."""
+
     access_token: str
     refresh_token: str
     token_type: str = "Bearer"
@@ -72,10 +77,12 @@ class AuthTokenResponse(BaseModel):
 
 class AccessTokenResponse(BaseModel):
     """Response containing a refreshed access token."""
+
     access_token: str
     token_type: str = "Bearer"
 
 
 class RefreshTokenRequest(BaseModel):
     """Request to refresh an access token."""
+
     refresh_token: str

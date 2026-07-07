@@ -22,11 +22,11 @@ class RepositoryWalker:
         Prunes self.excluded_dirs to prevent traversing into them.
         """
         normalized_excluded = {d.lower() for d in self.excluded_dirs}
-        
+
         for root, dirs, files in os.walk(root_dir):
             # Prune excluded directories in-place to prevent traversal
             dirs[:] = [d for d in dirs if d.lower() not in normalized_excluded]
-            
+
             for file in files:
                 abs_path = os.path.join(root, file)
                 rel_path = os.path.relpath(abs_path, root_dir).replace("\\", "/")

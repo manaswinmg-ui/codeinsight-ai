@@ -24,8 +24,18 @@ export const RecentReviewsPanel: React.FC<RecentReviewsPanelProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="glass-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>🔍 Recent Reviews</h3>
+      <div
+        className="glass-card"
+        style={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+          🔍 Recent Reviews
+        </h3>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <SkeletonCard variant="table-row" count={3} />
         </div>
@@ -34,24 +44,56 @@ export const RecentReviewsPanel: React.FC<RecentReviewsPanelProps> = ({
   }
 
   return (
-    <div className="glass-card" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
-      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>🔍 Recent Reviews</h3>
+    <div
+      className="glass-card"
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        minWidth: 0,
+      }}
+    >
+      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+        🔍 Recent Reviews
+      </h3>
       {reviews.length === 0 ? (
-        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <div
+          style={{
+            padding: '24px',
+            textAlign: 'center',
+            color: 'var(--text-muted)',
+          }}
+        >
           No reviews available. Try submitting a code snippet first!
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              textAlign: 'left',
+              minWidth: '500px',
+            }}
+          >
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+              <tr
+                style={{
+                  borderBottom: '1px solid var(--border-color)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.85rem',
+                }}
+              >
                 <th style={{ padding: '12px 16px' }}>Review ID</th>
                 <th style={{ padding: '12px 16px' }}>Language</th>
                 <th style={{ padding: '12px 16px' }}>Status</th>
                 <th style={{ padding: '12px 16px' }}>Quality Score</th>
                 <th style={{ padding: '12px 16px' }}>Findings</th>
                 <th style={{ padding: '12px 16px' }}>Tickets</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right' }}>Action</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right' }}>
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -67,9 +109,18 @@ export const RecentReviewsPanel: React.FC<RecentReviewsPanelProps> = ({
                   className="table-row-hover"
                   onClick={() => onSelectReview(rev.id)}
                 >
-                  <td style={{ padding: '12px 16px', fontWeight: 600 }}>#{rev.id}</td>
+                  <td style={{ padding: '12px 16px', fontWeight: 600 }}>
+                    #{rev.id}
+                  </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <span style={{ background: 'rgba(255,255,255,0.04)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>
+                    <span
+                      style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                      }}
+                    >
                       {rev.language}
                     </span>
                   </td>
@@ -113,8 +164,13 @@ export const RecentReviewsPanel: React.FC<RecentReviewsPanelProps> = ({
                     </span>
                   </td>
                   <td style={{ padding: '12px 16px' }}>{rev.findings_count}</td>
-                  <td style={{ padding: '12px 16px' }}>{rev.open_tickets_count} open</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
+                  <td style={{ padding: '12px 16px' }}>
+                    {rev.open_tickets_count} open
+                  </td>
+                  <td
+                    style={{ padding: '12px 16px', textAlign: 'right' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => onSelectReview(rev.id)}
                       className="btn btn-secondary"

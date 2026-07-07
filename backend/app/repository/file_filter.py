@@ -1,7 +1,8 @@
 import os
+
 from app.repository.file_descriptor import FileDescriptor
-from app.repository.scan_issue import ScanIssue
 from app.repository.language_detector import LanguageDetector
+from app.repository.scan_issue import ScanIssue
 
 
 class FileFilter:
@@ -17,7 +18,7 @@ class FileFilter:
         "__pycache__",
         "coverage",
         ".idea",
-        ".vscode"
+        ".vscode",
     }
 
     @classmethod
@@ -50,11 +51,11 @@ class FileFilter:
         if is_hidden:
             descriptor.status = "ignored"
             descriptor.is_supported = False
-            issues.append(ScanIssue(
-                path=descriptor.relative_path,
-                reason="Hidden File",
-                severity="INFO"
-            ))
+            issues.append(
+                ScanIssue(
+                    path=descriptor.relative_path, reason="Hidden File", severity="INFO"
+                )
+            )
             return issues
 
         # 2. Check for Temporary Files
@@ -62,33 +63,37 @@ class FileFilter:
         if ext in cls.TEMPORARY_EXTENSIONS:
             descriptor.status = "ignored"
             descriptor.is_supported = False
-            issues.append(ScanIssue(
-                path=descriptor.relative_path,
-                reason="Temporary File",
-                severity="INFO"
-            ))
+            issues.append(
+                ScanIssue(
+                    path=descriptor.relative_path,
+                    reason="Temporary File",
+                    severity="INFO",
+                )
+            )
             return issues
 
         # 3. Check for Binary Files
         if descriptor.is_binary:
             descriptor.status = "ignored"
             descriptor.is_supported = False
-            issues.append(ScanIssue(
-                path=descriptor.relative_path,
-                reason="Binary File",
-                severity="INFO"
-            ))
+            issues.append(
+                ScanIssue(
+                    path=descriptor.relative_path, reason="Binary File", severity="INFO"
+                )
+            )
             return issues
 
         # 4. Check for Maximum Size (e.g. 2 MB)
         if descriptor.size_bytes > cls.MAX_FILE_SIZE:
             descriptor.status = "ignored"
             descriptor.is_supported = False
-            issues.append(ScanIssue(
-                path=descriptor.relative_path,
-                reason="File Too Large",
-                severity="WARNING"
-            ))
+            issues.append(
+                ScanIssue(
+                    path=descriptor.relative_path,
+                    reason="File Too Large",
+                    severity="WARNING",
+                )
+            )
             return issues
 
         # 5. Check for Language Support (extension mapping)
@@ -96,11 +101,13 @@ class FileFilter:
         if not lang:
             descriptor.status = "unsupported"
             descriptor.is_supported = False
-            issues.append(ScanIssue(
-                path=descriptor.relative_path,
-                reason="Unsupported Extension",
-                severity="INFO"
-            ))
+            issues.append(
+                ScanIssue(
+                    path=descriptor.relative_path,
+                    reason="Unsupported Extension",
+                    severity="INFO",
+                )
+            )
             return issues
 
         # File is supported!

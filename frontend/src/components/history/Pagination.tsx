@@ -40,7 +40,13 @@ export const Pagination: React.FC<PaginationProps> = ({
         ◀ Previous
       </button>
 
-      <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+      <span
+        style={{
+          fontSize: '0.9rem',
+          color: 'var(--text-secondary)',
+          fontWeight: 600,
+        }}
+      >
         Page {currentPage} of {totalPages}
       </span>
 

@@ -41,9 +41,7 @@ logger = logging.getLogger("app.api.auth")
 async def register(
     payload: UserRegisterRequest,
     db: AsyncSession = Depends(get_db),
-    app_service: AuthApplicationService = Depends(
-        lambda: auth_application_service
-    ),
+    app_service: AuthApplicationService = Depends(lambda: auth_application_service),
 ) -> AuthTokenResponse:
     """Create a new user and return JWT tokens."""
     try:
@@ -80,9 +78,7 @@ async def register(
 async def login(
     payload: UserLoginRequest,
     db: AsyncSession = Depends(get_db),
-    app_service: AuthApplicationService = Depends(
-        lambda: auth_application_service
-    ),
+    app_service: AuthApplicationService = Depends(lambda: auth_application_service),
 ) -> AuthTokenResponse:
     """Authenticate with email and password, returning JWT tokens."""
     try:
@@ -116,9 +112,7 @@ async def login(
 async def refresh_token(
     payload: RefreshTokenRequest,
     db: AsyncSession = Depends(get_db),
-    app_service: AuthApplicationService = Depends(
-        lambda: auth_application_service
-    ),
+    app_service: AuthApplicationService = Depends(lambda: auth_application_service),
 ) -> AccessTokenResponse:
     """Generate a new access token from a valid refresh token."""
     try:
@@ -149,7 +143,9 @@ async def logout(
     Since JWTs are stateless, this is a no-op on the server side.
     The client should discard the stored tokens.
     """
-    logger.info("User logged out: id=%d, username=%s", current_user.id, current_user.username)
+    logger.info(
+        "User logged out: id=%d, username=%s", current_user.id, current_user.username
+    )
     return {"message": "Successfully logged out"}
 
 
@@ -160,9 +156,7 @@ async def logout(
 )
 async def get_me(
     current_user: User = Depends(get_current_user),
-    app_service: AuthApplicationService = Depends(
-        lambda: auth_application_service
-    ),
+    app_service: AuthApplicationService = Depends(lambda: auth_application_service),
 ) -> UserResponse:
     """Return profile information for the authenticated user."""
     return app_service.get_current_user_response(current_user)

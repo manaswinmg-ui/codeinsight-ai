@@ -32,7 +32,9 @@ class RepositoryDetailResponse(BaseModel):
     status: str = Field(..., description="Processing status of the repository")
     created_at: datetime
     updated_at: datetime
-    language_summary: dict[str, int] = Field(default_factory=dict, description="Files per language distribution")
+    language_summary: dict[str, int] = Field(
+        default_factory=dict, description="Files per language distribution"
+    )
     overall_quality: int = Field(100, description="Overall repository quality score")
     summary: str = Field("", description="Quality summary text")
 
@@ -70,7 +72,9 @@ class RepositoryQueryResponse(BaseModel):
     cost: float = Field(..., description="Calculated API cost of operations")
     escalated: bool = Field(..., description="Whether model routing escalated")
     reason: str = Field(..., description="Reason context for model selection")
-    files_retrieved: list[str] = Field(..., description="List of source files matching similarity context")
+    files_retrieved: list[str] = Field(
+        ..., description="List of source files matching similarity context"
+    )
 
 
 class RepositoryScanResultResponse(BaseModel):

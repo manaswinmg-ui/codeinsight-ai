@@ -14,7 +14,10 @@ const PIPELINE_STAGES = [
   { id: 5, label: 'Analysis Complete' },
 ];
 
-export const PipelineProgress: React.FC<PipelineProgressProps> = ({ status, currentStep }) => {
+export const PipelineProgress: React.FC<PipelineProgressProps> = ({
+  status,
+  currentStep,
+}) => {
   if (status === 'idle') return null;
 
   // Map backend currentStep (0-3) and status to our 6 stages (0-5)
@@ -45,16 +48,29 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ status, curr
         borderRadius: '16px',
       }}
     >
-      <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+      <h3
+        style={{
+          margin: 0,
+          fontSize: '1.05rem',
+          fontWeight: 700,
+          color: 'var(--text-secondary)',
+        }}
+      >
         Processing Pipeline
       </h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          position: 'relative',
+        }}
+      >
         {PIPELINE_STAGES.map((stage, idx) => {
           const isCompleted = status === 'success' || idx < activeStage;
           const isActive = status === 'processing' && idx === activeStage;
           const isFailed = status === 'error' && idx === activeStage;
-
 
           let circleColor = 'rgba(255, 255, 255, 0.1)';
           let textColor = 'var(--text-muted)';
@@ -78,8 +94,18 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ status, curr
           }
 
           return (
-            <div key={stage.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '6px 0' }}>
+            <div
+              key={stage.id}
+              style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  padding: '6px 0',
+                }}
+              >
                 {/* Visual Step Marker */}
                 <div
                   style={{
@@ -95,12 +121,20 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ status, curr
                     fontWeight: 800,
                     color: circleColor,
                     zIndex: 2,
-                    boxShadow: isActive ? '0 0 12px var(--accent-glow)' : 'none',
-                    animation: isActive ? 'pulse-glow 1.5s infinite ease-in-out' : 'none',
+                    boxShadow: isActive
+                      ? '0 0 12px var(--accent-glow)'
+                      : 'none',
+                    animation: isActive
+                      ? 'pulse-glow 1.5s infinite ease-in-out'
+                      : 'none',
                     transition: 'all 0.3s ease',
                   }}
                 >
-                  <span style={{ fontSize: isCompleted ? '0.9rem' : '0.75rem' }}>{checkmark}</span>
+                  <span
+                    style={{ fontSize: isCompleted ? '0.9rem' : '0.75rem' }}
+                  >
+                    {checkmark}
+                  </span>
                 </div>
 
                 {/* Stage Text */}
@@ -122,7 +156,9 @@ export const PipelineProgress: React.FC<PipelineProgressProps> = ({ status, curr
                   style={{
                     width: '2px',
                     height: '24px',
-                    background: isCompleted ? 'var(--success-color)' : 'rgba(255, 255, 255, 0.08)',
+                    background: isCompleted
+                      ? 'var(--success-color)'
+                      : 'rgba(255, 255, 255, 0.08)',
                     marginLeft: '13px',
                     marginTop: '-6px',
                     marginBottom: '-6px',

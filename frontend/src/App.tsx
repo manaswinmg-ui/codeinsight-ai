@@ -9,7 +9,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { UserMenu } from './components/auth/UserMenu';
 
-type Page = 'dashboard' | 'new-review' | 'history' | 'repository' | 'login' | 'register';
+type Page =
+  'dashboard' | 'new-review' | 'history' | 'repository' | 'login' | 'register';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -37,7 +38,10 @@ function App() {
           gap: '16px',
         }}
       >
-        <span className="pulse-indicator" style={{ width: '16px', height: '16px' }} />
+        <span
+          className="pulse-indicator"
+          style={{ width: '16px', height: '16px' }}
+        />
         Initializing CodeInsight AI...
       </div>
     );

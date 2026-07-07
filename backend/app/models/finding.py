@@ -50,4 +50,3 @@ class Finding(Base):
         cascade="all, delete-orphan",
         uselist=False,
     )
-

@@ -36,7 +36,7 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
         throw new Error('Failed to retrieve history');
       }
       const data = await response.json();
-      const items = Array.isArray(data) ? data : (data?.items || []);
+      const items = Array.isArray(data) ? data : data?.items || [];
       setHistory(items);
     } catch (err) {
       console.error(err);
@@ -48,7 +48,7 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
 
   useEffect(() => {
     fetchHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [activeReviewId]); // Re-fetch history when a new review starts or completes
 
   const formatShortDate = (dateStr: string) => {
@@ -106,7 +106,16 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
         >
           ➡️
         </button>
-        <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '2px' }}>
+        <div
+          style={{
+            writingMode: 'vertical-rl',
+            transform: 'rotate(180deg)',
+            color: 'var(--text-muted)',
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            letterSpacing: '2px',
+          }}
+        >
           HISTORY
         </div>
       </div>
@@ -140,7 +149,14 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '1.1rem' }}>📜</span>
-          <span style={{ fontWeight: 800, fontSize: '0.9rem', letterSpacing: '0.5px', color: 'var(--text-primary)' }}>
+          <span
+            style={{
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              letterSpacing: '0.5px',
+              color: 'var(--text-primary)',
+            }}
+          >
             Review History
           </span>
         </div>
@@ -187,12 +203,29 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
         }}
       >
         {loading && history.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem', padding: '24px 0' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '0.8rem',
+              padding: '24px 0',
+            }}
+          >
             Loading reviews...
           </div>
         ) : history.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem', padding: '24px 0', lineHeight: '1.4' }}>
-            No reviews yet.<br />Submit your first file!
+          <div
+            style={{
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '0.8rem',
+              padding: '24px 0',
+              lineHeight: '1.4',
+            }}
+          >
+            No reviews yet.
+            <br />
+            Submit your first file!
           </div>
         ) : (
           history.map((item) => {
@@ -204,8 +237,12 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
                 style={{
                   padding: '12px 16px',
                   borderRadius: '10px',
-                  background: isActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
-                  border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
+                  background: isActive
+                    ? 'rgba(99, 102, 241, 0.08)'
+                    : 'transparent',
+                  border: isActive
+                    ? '1px solid rgba(99, 102, 241, 0.3)'
+                    : '1px solid transparent',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
@@ -214,8 +251,10 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.background =
+                      'rgba(255, 255, 255, 0.02)';
+                    e.currentTarget.style.borderColor =
+                      'rgba(255, 255, 255, 0.05)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -225,8 +264,20 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
                   }
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
                     Review #{item.id}
                   </span>
                   <span
@@ -240,8 +291,18 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
                     title={item.status}
                   />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    fontSize: '0.75rem',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  <span
+                    style={{ textTransform: 'capitalize', fontWeight: 600 }}
+                  >
                     {item.language}
                   </span>
                   <span>{formatShortDate(item.created_at)}</span>

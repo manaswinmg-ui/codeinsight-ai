@@ -127,9 +127,7 @@ class AuthService:
         try:
             user_id = self._tkn_svc.decode_refresh_token(refresh_token)
         except JWTError as exc:
-            raise InvalidRefreshTokenError(
-                "Invalid or expired refresh token"
-            ) from exc
+            raise InvalidRefreshTokenError("Invalid or expired refresh token") from exc
 
         user = await self._user_repo.get(db, user_id)
         if user is None or not user.is_active:

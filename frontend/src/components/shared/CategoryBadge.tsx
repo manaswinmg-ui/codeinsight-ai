@@ -4,18 +4,21 @@ interface CategoryBadgeProps {
   category?: string | null;
 }
 
-const CATEGORY_META: Record<string, { icon: string; color: string; label: string }> = {
-  BUG:             { icon: '🐛', color: '#f87171', label: 'BUG' },
-  SECURITY:        { icon: '🔒', color: '#e879f9', label: 'SECURITY' },
-  PERFORMANCE:     { icon: '⚡', color: '#fbbf24', label: 'PERFORMANCE' },
+const CATEGORY_META: Record<
+  string,
+  { icon: string; color: string; label: string }
+> = {
+  BUG: { icon: '🐛', color: '#f87171', label: 'BUG' },
+  SECURITY: { icon: '🔒', color: '#e879f9', label: 'SECURITY' },
+  PERFORMANCE: { icon: '⚡', color: '#fbbf24', label: 'PERFORMANCE' },
   MAINTAINABILITY: { icon: '🔧', color: '#60a5fa', label: 'MAINTAINABILITY' },
-  ARCHITECTURE:    { icon: '🏛️', color: '#a78bfa', label: 'ARCHITECTURE' },
-  STYLE:           { icon: '🎨', color: '#34d399', label: 'STYLE' },
-  READABILITY:     { icon: '📖', color: '#34d399', label: 'READABILITY' },
-  RELIABILITY:     { icon: '🛡️', color: '#a78bfa', label: 'RELIABILITY' },
-  BEST_PRACTICE:   { icon: '✅', color: '#6ee7b7', label: 'BEST PRACTICE' },
-  DOCUMENTATION:   { icon: '📝', color: '#93c5fd', label: 'DOCUMENTATION' },
-  UNKNOWN:         { icon: '❓', color: '#9ca3af', label: 'UNKNOWN' },
+  ARCHITECTURE: { icon: '🏛️', color: '#a78bfa', label: 'ARCHITECTURE' },
+  STYLE: { icon: '🎨', color: '#34d399', label: 'STYLE' },
+  READABILITY: { icon: '📖', color: '#34d399', label: 'READABILITY' },
+  RELIABILITY: { icon: '🛡️', color: '#a78bfa', label: 'RELIABILITY' },
+  BEST_PRACTICE: { icon: '✅', color: '#6ee7b7', label: 'BEST PRACTICE' },
+  DOCUMENTATION: { icon: '📝', color: '#93c5fd', label: 'DOCUMENTATION' },
+  UNKNOWN: { icon: '❓', color: '#9ca3af', label: 'UNKNOWN' },
 };
 
 export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ category }) => {

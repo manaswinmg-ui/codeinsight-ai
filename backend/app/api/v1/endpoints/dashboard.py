@@ -21,13 +21,17 @@ logger = logging.getLogger("app.api.dashboard")
 )
 async def get_dashboard_metrics(
     db: AsyncSession = Depends(get_db),
-    app_service: DashboardApplicationService = Depends(lambda: dashboard_application_service),
+    app_service: DashboardApplicationService = Depends(
+        lambda: dashboard_application_service
+    ),
 ) -> DashboardMetrics:
     """Retrieve workspace overview metrics (reviews, tickets, and quality averages)."""
     try:
         return await app_service.get_dashboard_metrics(db)
     except Exception as err:
-        logger.error("Unexpected error fetching dashboard metrics: %s", err, exc_info=True)
+        logger.error(
+            "Unexpected error fetching dashboard metrics: %s", err, exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
@@ -42,7 +46,9 @@ async def get_dashboard_metrics(
 async def get_recent_reviews(
     limit: int = 5,
     db: AsyncSession = Depends(get_db),
-    app_service: DashboardApplicationService = Depends(lambda: dashboard_application_service),
+    app_service: DashboardApplicationService = Depends(
+        lambda: dashboard_application_service
+    ),
 ) -> list[ReviewSummary]:
     """Retrieve top recent code reviews."""
     try:
@@ -63,7 +69,9 @@ async def get_recent_reviews(
 async def get_recent_tickets(
     limit: int = 5,
     db: AsyncSession = Depends(get_db),
-    app_service: DashboardApplicationService = Depends(lambda: dashboard_application_service),
+    app_service: DashboardApplicationService = Depends(
+        lambda: dashboard_application_service
+    ),
 ) -> list[TicketSummary]:
     """Retrieve top recent tickets."""
     try:

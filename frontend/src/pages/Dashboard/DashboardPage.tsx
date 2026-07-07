@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { DashboardStats, DashboardMetrics } from '../../components/dashboard/DashboardStats';
+import {
+  DashboardStats,
+  DashboardMetrics,
+} from '../../components/dashboard/DashboardStats';
 import { QuickActionsPanel } from '../../components/dashboard/QuickActionsPanel';
-import { RecentReviewsPanel, ReviewSummary } from '../../components/dashboard/RecentReviewsPanel';
-import { RecentTicketsPanel, TicketSummary } from '../../components/dashboard/RecentTicketsPanel';
+import {
+  RecentReviewsPanel,
+  ReviewSummary,
+} from '../../components/dashboard/RecentReviewsPanel';
+import {
+  RecentTicketsPanel,
+  TicketSummary,
+} from '../../components/dashboard/RecentTicketsPanel';
 
 type Page = 'dashboard' | 'new-review' | 'history' | 'repository';
 
@@ -45,7 +54,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
     const fetchReviews = async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/v1/dashboard/recent-reviews?limit=5`);
+        const response = await fetch(
+          `${baseUrl}/api/v1/dashboard/recent-reviews?limit=5`
+        );
         if (!response.ok) throw new Error('Failed to load recent reviews');
         const data = await response.json();
         setReviews(data);
@@ -58,7 +69,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
     const fetchTickets = async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/v1/dashboard/recent-tickets?limit=5`);
+        const response = await fetch(
+          `${baseUrl}/api/v1/dashboard/recent-tickets?limit=5`
+        );
         if (!response.ok) throw new Error('Failed to load recent tickets');
         const data = await response.json();
         setTickets(data);
@@ -80,7 +93,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Metrics Row */}
       <section>
-        <h2 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
+        <h2
+          style={{
+            margin: '0 0 16px 0',
+            fontSize: '1.2rem',
+            color: 'var(--text-secondary)',
+          }}
+        >
           Workspace Metrics
         </h2>
         {error && (

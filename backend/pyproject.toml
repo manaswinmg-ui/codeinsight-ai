@@ -36,6 +36,10 @@ select = [
 ignore = [
     "B008",  # do not perform function calls in argument defaults (FastAPI Depends)
     "UP046", # Generic class uses Generic subclass instead of type parameters
+    "E501",  # line too long
+    "C901",  # complex functions
+    "E741",  # ambiguous variable name
+    "B904",  # raise from exception
 ]
 
 [tool.ruff.lint.isort]

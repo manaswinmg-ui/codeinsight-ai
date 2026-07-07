@@ -44,7 +44,9 @@ def findings_match(f1: Finding, f2: Finding) -> bool:
 
 
 class ReviewHistoryApplicationService:
-    def __init__(self, review_query_repo: ReviewQueryRepository = review_query_repository) -> None:
+    def __init__(
+        self, review_query_repo: ReviewQueryRepository = review_query_repository
+    ) -> None:
         self.review_query_repo = review_query_repo
 
     async def search_reviews(
@@ -55,14 +57,17 @@ class ReviewHistoryApplicationService:
         summaries = []
         for r, score in items_with_scores:
             open_tickets_count = sum(
-                1 for f in r.findings
+                1
+                for f in r.findings
                 if f.ticket and f.ticket.status.name not in ("DONE", "CLOSED")
             )
             summaries.append(
                 ReviewSummary(
                     id=r.id,
                     language=r.language,
-                    status=r.status.name if hasattr(r.status, "name") else str(r.status),
+                    status=(
+                        r.status.name if hasattr(r.status, "name") else str(r.status)
+                    ),
                     created_at=r.created_at,
                     quality_score=score,
                     findings_count=len(r.findings),
@@ -82,8 +87,14 @@ class ReviewHistoryApplicationService:
         self, db: AsyncSession, left_id: int, right_id: int
     ) -> ReviewComparisonResponse:
         """Compare two reviews on quality, new findings, resolved findings, and ticket progress."""
-        left_review = await self.review_query_repo.get_review_with_findings_and_tickets(db, left_id)
-        right_review = await self.review_query_repo.get_review_with_findings_and_tickets(db, right_id)
+        left_review = await self.review_query_repo.get_review_with_findings_and_tickets(
+            db, left_id
+        )
+        right_review = (
+            await self.review_query_repo.get_review_with_findings_and_tickets(
+                db, right_id
+            )
+        )
 
         if not left_review or not right_review:
             raise ValueError("One or both reviews to compare could not be found.")
@@ -116,7 +127,11 @@ class ReviewHistoryApplicationService:
                         id=lf.id,
                         title=lf.title,
                         severity=lf.severity,
-                        category=lf.category.name if hasattr(lf.category, "name") else str(lf.category or "UNKNOWN"),
+                        category=(
+                            lf.category.name
+                            if hasattr(lf.category, "name")
+                            else str(lf.category or "UNKNOWN")
+                        ),
                         line_start=lf.line_start,
                     )
                 )
@@ -132,14 +147,19 @@ class ReviewHistoryApplicationService:
                         id=rf.id,
                         title=rf.title,
                         severity=rf.severity,
-                        category=rf.category.name if hasattr(rf.category, "name") else str(rf.category or "UNKNOWN"),
+                        category=(
+                            rf.category.name
+                            if hasattr(rf.category, "name")
+                            else str(rf.category or "UNKNOWN")
+                        ),
                         line_start=rf.line_start,
                     )
                 )
 
         # Count closed tickets from left review findings
         tickets_closed = sum(
-            1 for lf in left_findings
+            1
+            for lf in left_findings
             if lf.ticket and lf.ticket.status.name in ("DONE", "CLOSED")
         )
 

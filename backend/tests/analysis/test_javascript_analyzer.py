@@ -29,7 +29,10 @@ async def test_javascript_analyzer_analyze_success() -> None:
     assert f.severity == "medium"
     assert f.category == "BEST_PRACTICE"
     assert f.line == 1
-    assert "assigned a value but never used" in f.description.lower() or "unused" in f.description.lower()
+    assert (
+        "assigned a value but never used" in f.description.lower()
+        or "unused" in f.description.lower()
+    )
 
 
 @pytest.mark.asyncio

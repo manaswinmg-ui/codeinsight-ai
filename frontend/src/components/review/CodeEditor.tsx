@@ -68,7 +68,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             readOnly: disabled,
             minimap: { enabled: false },
             fontSize: 14,
-            fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+            fontFamily:
+              'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
             lineNumbers: 'on',
             roundedSelection: true,
             scrollBeyondLastLine: false,

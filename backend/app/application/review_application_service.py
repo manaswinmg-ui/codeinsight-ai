@@ -97,9 +97,7 @@ class ReviewApplicationService:
     # Use Case 2: List all past reviews (history sidebar)
     # ─────────────────────────────────────────────────────────────────────────
 
-    async def list_reviews(
-        self, db: AsyncSession
-    ) -> list[ReviewListItemResponse]:
+    async def list_reviews(self, db: AsyncSession) -> list[ReviewListItemResponse]:
         """Return a lightweight list of all reviews, ordered newest first."""
         reviews = await self._review_svc.list_reviews(db)
         return [
@@ -160,9 +158,7 @@ class ReviewApplicationService:
 
         # ── Textual summary: derived from review status ─────────────────────
         status_name = (
-            review.status.name
-            if hasattr(review.status, "name")
-            else str(review.status)
+            review.status.name if hasattr(review.status, "name") else str(review.status)
         )
 
         if status_name == ReviewStatus.COMPLETED:

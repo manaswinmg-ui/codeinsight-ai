@@ -29,7 +29,9 @@ class ReviewQueryRepository:
 
         # 2. Completed reviews count
         completed_result = await db.execute(
-            select(func.count(Review.id)).filter(Review.status == ReviewStatus.COMPLETED)
+            select(func.count(Review.id)).filter(
+                Review.status == ReviewStatus.COMPLETED
+            )
         )
         completed_reviews = completed_result.scalar_one() or 0
 
@@ -47,7 +49,9 @@ class ReviewQueryRepository:
 
         # 5. Average Quality Score (calculated across completed reviews)
         completed_reviews_data = await db.execute(
-            select(Review).filter(Review.status == ReviewStatus.COMPLETED).options(selectinload(Review.findings))
+            select(Review)
+            .filter(Review.status == ReviewStatus.COMPLETED)
+            .options(selectinload(Review.findings))
         )
         all_completed = completed_reviews_data.scalars().all()
 
@@ -65,7 +69,9 @@ class ReviewQueryRepository:
             "language_distribution": language_distribution,
         }
 
-    async def get_recent_reviews(self, db: AsyncSession, limit: int = 5) -> list[Review]:
+    async def get_recent_reviews(
+        self, db: AsyncSession, limit: int = 5
+    ) -> list[Review]:
         """Retrieve recent reviews eagerly loading findings and tickets."""
         result = await db.execute(
             select(Review)
@@ -75,7 +81,9 @@ class ReviewQueryRepository:
         )
         return list(result.scalars().all())
 
-    async def get_review_with_findings_and_tickets(self, db: AsyncSession, review_id: int) -> Review | None:
+    async def get_review_with_findings_and_tickets(
+        self, db: AsyncSession, review_id: int
+    ) -> Review | None:
         """Fetch review details, eagerly loading findings and associated tickets."""
         result = await db.execute(
             select(Review)
@@ -84,10 +92,14 @@ class ReviewQueryRepository:
         )
         return result.scalars().first()
 
-    async def search(self, db: AsyncSession, query: ReviewSearchQuery) -> tuple[list[tuple[Review, int]], int]:
+    async def search(
+        self, db: AsyncSession, query: ReviewSearchQuery
+    ) -> tuple[list[tuple[Review, int]], int]:
         """Search, filter, sort, and paginate reviews."""
         # Start base statement
-        stmt = select(Review).options(selectinload(Review.findings).selectinload(Finding.ticket))
+        stmt = select(Review).options(
+            selectinload(Review.findings).selectinload(Finding.ticket)
+        )
 
         # Filter by status
         if query.status:
@@ -115,7 +127,9 @@ class ReviewQueryRepository:
                 Review.language.ilike(f"%{search_term}%"),
                 Review.findings.any(Finding.title.ilike(f"%{search_term}%")),
                 Review.findings.any(Finding.description.ilike(f"%{search_term}%")),
-                Review.findings.any(Finding.ticket.has(Ticket.title.ilike(f"%{search_term}%"))),
+                Review.findings.any(
+                    Finding.ticket.has(Ticket.title.ilike(f"%{search_term}%"))
+                ),
             ]
             if search_term.isdigit():
                 conditions.append(Review.id == int(search_term))

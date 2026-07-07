@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import zipfile
+
 from app.repository.sources.base import RepositorySource
 
 
@@ -29,21 +30,28 @@ class RepositoryExtractor:
             raise ValueError("Invalid ZIP file format.")
 
         self.temp_dir = tempfile.mkdtemp(prefix="codeinsight_scan_")
-        
+
         try:
             with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
                 for member in zf.infolist():
                     # Prevents Zip Slip path traversal vulnerability
-                    target_path = os.path.abspath(os.path.join(self.temp_dir, member.filename))
+                    target_path = os.path.abspath(
+                        os.path.join(self.temp_dir, member.filename)
+                    )
                     if not target_path.startswith(os.path.abspath(self.temp_dir)):
-                        raise ValueError(f"Zip Slip security vulnerability detected: {member.filename}")
-                    
+                        raise ValueError(
+                            f"Zip Slip security vulnerability detected: {member.filename}"
+                        )
+
                     if member.is_dir():
                         os.makedirs(target_path, exist_ok=True)
                         continue
 
                     os.makedirs(os.path.dirname(target_path), exist_ok=True)
-                    with zf.open(member) as source_file, open(target_path, "wb") as target_file:
+                    with (
+                        zf.open(member) as source_file,
+                        open(target_path, "wb") as target_file,
+                    ):
                         shutil.copyfileobj(source_file, target_file)
 
             return self.temp_dir

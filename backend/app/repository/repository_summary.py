@@ -37,10 +37,9 @@ class RepositorySummary:
 
             # 2. Extract size
             size_bytes = fr.size_bytes or 0
-            largest_files_list.append({
-                "file_path": fr.file_path,
-                "size_bytes": size_bytes
-            })
+            largest_files_list.append(
+                {"file_path": fr.file_path, "size_bytes": size_bytes}
+            )
 
             # 3. Process findings and quality score
             findings = review.findings or []
@@ -62,11 +61,13 @@ class RepositorySummary:
 
             # If there are findings, add to candidate problematic files
             if findings_count > 0:
-                problematic_files_list.append({
-                    "file_path": fr.file_path,
-                    "findings_count": findings_count,
-                    "quality_score": quality_score
-                })
+                problematic_files_list.append(
+                    {
+                        "file_path": fr.file_path,
+                        "findings_count": findings_count,
+                        "quality_score": quality_score,
+                    }
+                )
 
         # Calculate averages
         overall_quality = 100
@@ -100,6 +101,6 @@ class RepositorySummary:
                 "critical_findings": critical_findings,
                 "open_tickets": open_tickets,
                 "largest_files": largest_files,
-                "most_problematic_files": most_problematic_files
-            }
+                "most_problematic_files": most_problematic_files,
+            },
         }

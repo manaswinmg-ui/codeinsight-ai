@@ -29,7 +29,18 @@ class JavaScriptAnalyzer(BaseAnalyzer):
         """Run ESLint on a temporary file and parse the JSON output."""
         # Determine file extension based on code features
         extension = ".js"
-        if any(keyword in code for keyword in ["interface ", "type ", "as ", ": string", ": number", ": boolean", ": any"]):
+        if any(
+            keyword in code
+            for keyword in [
+                "interface ",
+                "type ",
+                "as ",
+                ": string",
+                ": number",
+                ": boolean",
+                ": any",
+            ]
+        ):
             extension = ".ts"
 
         npx_path = self._get_npx_path()
@@ -43,7 +54,9 @@ class JavaScriptAnalyzer(BaseAnalyzer):
         try:
             os.makedirs(temp_dir, exist_ok=True)
         except Exception as e:
-            logger.error("Failed to create temp directory for JS/TS static analysis: %s", e)
+            logger.error(
+                "Failed to create temp directory for JS/TS static analysis: %s", e
+            )
             return []
 
         temp_file_path = os.path.join(temp_dir, f"temp_{uuid.uuid4().hex}{extension}")
@@ -63,27 +76,34 @@ class JavaScriptAnalyzer(BaseAnalyzer):
 
             # Check if frontend eslintrc config exists
             if not os.path.exists(eslintrc_path):
-                logger.warning("ESLint configuration not found at %s. Static analysis skipped.", eslintrc_path)
+                logger.warning(
+                    "ESLint configuration not found at %s. Static analysis skipped.",
+                    eslintrc_path,
+                )
                 return []
 
             cmd = [
                 npx_path,
                 "eslint",
-                "--format", "json",
+                "--format",
+                "json",
                 "--no-ignore",
-                "--config", eslintrc_path,
-                temp_file_path
+                "--config",
+                eslintrc_path,
+                temp_file_path,
             ]
 
             proc = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                cwd=frontend_dir
+                cwd=frontend_dir,
             )
 
             try:
-                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=15.0)
+                stdout, stderr = await asyncio.wait_for(
+                    proc.communicate(), timeout=15.0
+                )
             except TimeoutError:
                 logger.error("ESLint static analysis timed out.")
                 try:
@@ -100,7 +120,9 @@ class JavaScriptAnalyzer(BaseAnalyzer):
             try:
                 reports = json.loads(stdout_str)
             except json.JSONDecodeError:
-                logger.error("Failed to parse ESLint JSON output. Output: %s", stdout_str)
+                logger.error(
+                    "Failed to parse ESLint JSON output. Output: %s", stdout_str
+                )
                 return []
 
             if not isinstance(reports, list):
@@ -110,7 +132,7 @@ class JavaScriptAnalyzer(BaseAnalyzer):
             for file_report in reports:
                 if not isinstance(file_report, dict):
                     continue
-                
+
                 messages = file_report.get("messages", [])
                 for msg in messages:
                     if not isinstance(msg, dict):
@@ -143,9 +165,22 @@ class JavaScriptAnalyzer(BaseAnalyzer):
                     rule_lower = rule_code.lower()
                     if is_fatal:
                         category = "BUG"
-                    elif any(k in rule_lower for k in ["eval", "security", "xss", "csrf", "injection"]):
+                    elif any(
+                        k in rule_lower
+                        for k in ["eval", "security", "xss", "csrf", "injection"]
+                    ):
                         category = "SECURITY"
-                    elif any(k in rule_lower for k in ["no-undef", "no-unreachable", "use-isnan", "rules-of-hooks", "no-empty", "no-constant-condition"]):
+                    elif any(
+                        k in rule_lower
+                        for k in [
+                            "no-undef",
+                            "no-unreachable",
+                            "use-isnan",
+                            "rules-of-hooks",
+                            "no-empty",
+                            "no-constant-condition",
+                        ]
+                    ):
                         category = "BUG"
                     else:
                         category = "BEST_PRACTICE"
@@ -159,12 +194,14 @@ class JavaScriptAnalyzer(BaseAnalyzer):
                         rule=rule_code,
                         tool="eslint",
                         category=category,
-                        confidence=100
+                        confidence=100,
                     )
                     findings.append(finding)
 
         except FileNotFoundError:
-            logger.warning("npx/eslint executable not found. JS/TS static analysis skipped.")
+            logger.warning(
+                "npx/eslint executable not found. JS/TS static analysis skipped."
+            )
         except Exception as e:
             logger.error("Error executing ESLint static analysis: %s", e)
         finally:
@@ -173,6 +210,8 @@ class JavaScriptAnalyzer(BaseAnalyzer):
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
             except Exception as e:
-                logger.warning("Failed to remove temp JS/TS file %s: %s", temp_file_path, e)
+                logger.warning(
+                    "Failed to remove temp JS/TS file %s: %s", temp_file_path, e
+                )
 
         return findings

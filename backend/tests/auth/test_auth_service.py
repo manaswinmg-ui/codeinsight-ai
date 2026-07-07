@@ -127,9 +127,7 @@ async def test_authenticate_invalid_email() -> None:
 
     auth_svc = AuthService(user_repo=user_repo, pwd_svc=pwd_svc, tkn_svc=tkn_svc)
     with pytest.raises(InvalidCredentialsError):
-        await auth_svc.authenticate(
-            db, email="wrong@example.com", password="password"
-        )
+        await auth_svc.authenticate(db, email="wrong@example.com", password="password")
 
 
 @pytest.mark.asyncio
@@ -139,15 +137,19 @@ async def test_authenticate_wrong_password() -> None:
     pwd_svc = MagicMock()
     tkn_svc = MagicMock()
 
-    user = User(id=1, email="user@example.com", username="user1", hashed_password="hashed", is_active=True)
+    user = User(
+        id=1,
+        email="user@example.com",
+        username="user1",
+        hashed_password="hashed",
+        is_active=True,
+    )
     user_repo.get_by_email = AsyncMock(return_value=user)
     pwd_svc.verify_password.return_value = False
 
     auth_svc = AuthService(user_repo=user_repo, pwd_svc=pwd_svc, tkn_svc=tkn_svc)
     with pytest.raises(InvalidCredentialsError):
-        await auth_svc.authenticate(
-            db, email="user@example.com", password="wrong"
-        )
+        await auth_svc.authenticate(db, email="user@example.com", password="wrong")
 
 
 @pytest.mark.asyncio
@@ -196,6 +198,7 @@ async def test_refresh_token_invalid() -> None:
     tkn_svc = MagicMock()
 
     from jose import JWTError
+
     tkn_svc.decode_refresh_token.side_effect = JWTError("Invalid token")
 
     auth_svc = AuthService(user_repo=user_repo, pwd_svc=pwd_svc, tkn_svc=tkn_svc)

@@ -12,7 +12,11 @@ class FindingMapper:
             # Normalize category to ORM enum; default to UNKNOWN
             raw_category = getattr(dto, "category", None)
             try:
-                category = FindingCategory(raw_category) if raw_category else FindingCategory.UNKNOWN
+                category = (
+                    FindingCategory(raw_category)
+                    if raw_category
+                    else FindingCategory.UNKNOWN
+                )
             except ValueError:
                 category = FindingCategory.UNKNOWN
 

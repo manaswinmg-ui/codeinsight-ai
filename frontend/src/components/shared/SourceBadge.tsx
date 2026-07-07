@@ -4,7 +4,10 @@ interface SourceBadgeProps {
   source: string;
 }
 
-const SOURCE_META: Record<string, { label: string; icon: string; color: string; bg: string; border: string }> = {
+const SOURCE_META: Record<
+  string,
+  { label: string; icon: string; color: string; bg: string; border: string }
+> = {
   ai: {
     label: 'AI',
     icon: '🤖',

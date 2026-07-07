@@ -1,15 +1,16 @@
 import io
 import zipfile
-import pytest
 from unittest.mock import MagicMock
 
-from app.repository.sources.zip_source import ZipRepositorySource
+import pytest
+
 from app.repository.extractor import RepositoryExtractor
-from app.repository.walker import RepositoryWalker
-from app.repository.file_filter import FileFilter
 from app.repository.file_descriptor import FileDescriptor
-from app.repository.tree_builder import TreeBuilder
+from app.repository.file_filter import FileFilter
 from app.repository.repository_scanner import RepositoryScanner
+from app.repository.sources.zip_source import ZipRepositorySource
+from app.repository.tree_builder import TreeBuilder
+from app.repository.walker import RepositoryWalker
 
 
 def create_in_memory_zip(files: dict[str, bytes]) -> bytes:
@@ -30,12 +31,10 @@ def test_repository_source():
 
 def test_extractor_zip_slip():
     # ZIP with path traversal member filename
-    bad_files = {
-        "../../evil.py": b"print('hacked')"
-    }
+    bad_files = {"../../evil.py": b"print('hacked')"}
     zip_bytes = create_in_memory_zip(bad_files)
     source = ZipRepositorySource(zip_bytes, "evil.zip")
-    
+
     extractor = RepositoryExtractor()
     with pytest.raises(ValueError, match="Zip Slip"):
         extractor.extract(source)
@@ -64,7 +63,7 @@ def test_walker_exclusions(tmp_path):
 
     walker = RepositoryWalker()
     results = list(walker.walk(str(tmp_path)))
-    
+
     # Assert exclusions were skipped
     rel_paths = [r[0] for r in results]
     assert "src/main.py" in rel_paths
@@ -159,18 +158,18 @@ def test_scanner_end_to_end():
         "node_modules/lodash.js": b"// dummy",
         "README.md": b"# Docs",
         "temp.tmp": b"temp",
-        "binary.bin": b"\x00\x01\x02"
+        "binary.bin": b"\x00\x01\x02",
     }
     zip_bytes = create_in_memory_zip(files)
     source = ZipRepositorySource(zip_bytes, "demo.zip")
-    
+
     result = RepositoryScanner.scan(source)
     assert result.status == "COMPLETED"
-    
+
     manifest = result.manifest
     assert manifest.repository_name == "demo.zip"
     assert len(manifest.files) > 0
-    
+
     stats = manifest.statistics
     assert stats.total_files == 5  # Excluding node_modules directory traversal
     assert stats.supported_files == 2  # main.py, utils.py

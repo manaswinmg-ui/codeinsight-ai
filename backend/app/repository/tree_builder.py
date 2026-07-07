@@ -27,10 +27,10 @@ class TreeBuilder:
         lines = []
         keys = sorted(tree.keys())
         for idx, key in enumerate(keys):
-            is_last = (idx == len(keys) - 1)
+            is_last = idx == len(keys) - 1
             connector = "└── " if is_last else "├── "
             lines.append(f"{prefix}{connector}{key}")
-            
+
             sub_tree = tree[key]
             if sub_tree:
                 extension_prefix = "    " if is_last else "│   "

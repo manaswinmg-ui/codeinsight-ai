@@ -1,5 +1,10 @@
 from app.ai.response_parser import Finding
-from app.analysis.merger import FindingMerger, clean_tokens, jaccard_similarity, is_relevant_finding
+from app.analysis.merger import (
+    FindingMerger,
+    clean_tokens,
+    is_relevant_finding,
+    jaccard_similarity,
+)
 from app.analysis.models import StaticFinding
 
 
@@ -27,15 +32,28 @@ def test_jaccard_similarity() -> None:
 
 def test_is_relevant_finding_filters_noise() -> None:
     # Noise/hallucinations should be filtered
-    f_noise = Finding(title="No vulnerabilities found", description="Checked code and found nothing", severity="info")
+    f_noise = Finding(
+        title="No vulnerabilities found",
+        description="Checked code and found nothing",
+        severity="info",
+    )
     assert not is_relevant_finding(f_noise)
 
     # Valid findings should pass
-    f_valid = Finding(title="SQL Injection", description="Raw SQL parameter formatting allows injection", severity="critical")
+    f_valid = Finding(
+        title="SQL Injection",
+        description="Raw SQL parameter formatting allows injection",
+        severity="critical",
+    )
     assert is_relevant_finding(f_valid)
 
     # Low confidence should be filtered
-    f_low_conf = Finding(title="SQL Injection", description="Raw SQL parameter formatting allows injection", severity="critical", confidence=30)
+    f_low_conf = Finding(
+        title="SQL Injection",
+        description="Raw SQL parameter formatting allows injection",
+        severity="critical",
+        confidence=30,
+    )
     assert not is_relevant_finding(f_low_conf)
 
 
@@ -48,7 +66,7 @@ def test_merger_deduplicates_cleaned_tokens() -> None:
         line=10,
         column=1,
         rule="F841",
-        tool="ruff"
+        tool="ruff",
     )
     # Variable y on same line is NOT a duplicate (due to stop-word filtering & different token)
     ai_other_var = Finding(
@@ -57,7 +75,7 @@ def test_merger_deduplicates_cleaned_tokens() -> None:
         severity="low",
         line_start=10,
         line_end=10,
-        confidence=80
+        confidence=80,
     )
 
     merged = merger.merge([sf], [ai_other_var])

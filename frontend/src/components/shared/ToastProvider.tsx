@@ -14,7 +14,7 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
@@ -23,7 +23,9 @@ export const useToast = () => {
   return context;
 };
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
@@ -101,7 +103,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 border: styleConfig.border,
                 borderLeft: styleConfig.borderLeft,
                 borderRadius: '8px',
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5)',
+                boxShadow:
+                  '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5)',
                 color: 'var(--text-primary)',
                 fontSize: '0.88rem',
                 lineHeight: '1.4',
@@ -111,8 +114,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 WebkitBackdropFilter: 'blur(12px)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.1rem', color: styleConfig.iconColor }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <span
+                  style={{ fontSize: '1.1rem', color: styleConfig.iconColor }}
+                >
                   {styleConfig.icon}
                 </span>
                 <span>{toast.message}</span>
@@ -131,8 +138,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   justifyContent: 'center',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => ((e.target as HTMLButtonElement).style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => ((e.target as HTMLButtonElement).style.color = 'var(--text-muted)')}
+                onMouseEnter={(e) =>
+                  ((e.target as HTMLButtonElement).style.color =
+                    'var(--text-primary)')
+                }
+                onMouseLeave={(e) =>
+                  ((e.target as HTMLButtonElement).style.color =
+                    'var(--text-muted)')
+                }
               >
                 &times;
               </button>

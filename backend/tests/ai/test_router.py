@@ -1,11 +1,12 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from app.ai.token_optimizer import TokenOptimizer
+import pytest
+
 from app.ai.cost_logger import CostLogger
+from app.ai.providers.mock_provider import MockAIProvider
 from app.ai.retrieval import RepositoryRetrievalService
 from app.ai.router import AIRouter
-from app.ai.providers.mock_provider import MockAIProvider
+from app.ai.token_optimizer import TokenOptimizer
 
 
 def test_token_optimizer_duplicates():
@@ -38,7 +39,10 @@ def test_token_optimizer_should_ignore():
     assert TokenOptimizer.should_ignore_file("node_modules/express/index.js") is True
     assert TokenOptimizer.should_ignore_file("src/main.py") is False
     assert TokenOptimizer.should_ignore_file("package-lock.json") is True
-    assert TokenOptimizer.should_ignore_file("package-lock.json", allow_lock_files=True) is False
+    assert (
+        TokenOptimizer.should_ignore_file("package-lock.json", allow_lock_files=True)
+        is False
+    )
     assert TokenOptimizer.should_ignore_file("build/main.o") is True
 
 
@@ -73,23 +77,23 @@ def test_retrieval_chunking_and_similarity():
 async def test_router_normal_routing():
     mock_provider = MockAIProvider()
     router = AIRouter(provider=mock_provider)
-    
+
     # Create mock session
     db = MagicMock()
-    
+
     # Mock retrieval service results
     mock_chunks = [
         {"path": "src/main.py", "content": "print('hello')", "similarity": 0.8}
     ]
-    
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(
             "app.ai.retrieval.repository_retrieval_service.retrieve_context",
-            AsyncMock(return_value=mock_chunks)
+            AsyncMock(return_value=mock_chunks),
         )
-        
+
         result = await router.query_repository(db, 1, "How does it work?")
-        
+
         assert result["model_used"] == "gpt-5.4-mini"
         assert result["escalated"] is False
         assert "gpt-5.4-mini" in result["answer"]
@@ -101,16 +105,18 @@ async def test_router_escalate_on_complexity():
     mock_provider = MockAIProvider()
     router = AIRouter(provider=mock_provider)
     db = MagicMock()
-    
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(
             "app.ai.retrieval.repository_retrieval_service.retrieve_context",
-            AsyncMock(return_value=[])
+            AsyncMock(return_value=[]),
         )
-        
+
         # Query with security audit keyword triggers immediate escalation
-        result = await router.query_repository(db, 1, "Run a security audit on this project.")
-        
+        result = await router.query_repository(
+            db, 1, "Run a security audit on this project."
+        )
+
         assert result["model_used"] == "gpt-5.5"
         assert result["escalated"] is True
         assert "gpt-5.5" in result["answer"]
@@ -122,16 +128,16 @@ async def test_router_escalate_on_insufficient_context():
     mock_provider = MockAIProvider()
     router = AIRouter(provider=mock_provider)
     db = MagicMock()
-    
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(
             "app.ai.retrieval.repository_retrieval_service.retrieve_context",
-            AsyncMock(return_value=[])
+            AsyncMock(return_value=[]),
         )
-        
+
         # "escalate_insufficient" is mocked to return insufficient context phrase
         result = await router.query_repository(db, 1, "escalate_insufficient")
-        
+
         assert result["model_used"] == "gpt-5.5"
         assert result["escalated"] is True
         assert "gpt-5.5" in result["answer"]
@@ -143,16 +149,16 @@ async def test_router_escalate_on_low_confidence():
     mock_provider = MockAIProvider()
     router = AIRouter(provider=mock_provider)
     db = MagicMock()
-    
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(
             "app.ai.retrieval.repository_retrieval_service.retrieve_context",
-            AsyncMock(return_value=[])
+            AsyncMock(return_value=[]),
         )
-        
+
         # "escalate_low_confidence" is mocked to return a JSON with confidence = 45
         result = await router.query_repository(db, 1, "escalate_low_confidence")
-        
+
         assert result["model_used"] == "gpt-5.5"
         assert result["escalated"] is True
         assert "gpt-5.5" in result["answer"]
@@ -164,16 +170,16 @@ async def test_router_escalate_on_primary_failure():
     mock_provider = MockAIProvider()
     router = AIRouter(provider=mock_provider)
     db = MagicMock()
-    
+
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(
             "app.ai.retrieval.repository_retrieval_service.retrieve_context",
-            AsyncMock(return_value=[])
+            AsyncMock(return_value=[]),
         )
-        
+
         # "raise_api_error" is mocked to raise AIError on primary model
         result = await router.query_repository(db, 1, "raise_api_error")
-        
+
         assert result["model_used"] == "gpt-5.5"
         assert result["escalated"] is True
         assert "gpt-5.5" in result["answer"]
