@@ -180,6 +180,7 @@ def test_scanner_end_to_end():
     # Check back-compat scan_zip wrapper
     compat_files = RepositoryScanner.scan_zip(zip_bytes)
     assert len(compat_files) == 2
+    compat_files = sorted(compat_files, key=lambda f: f["path"])
     assert compat_files[0]["path"] == "src/main.py"
     assert compat_files[0]["content"] == "print('hello')"
     assert compat_files[0]["language"] == "python"
