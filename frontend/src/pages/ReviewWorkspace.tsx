@@ -213,7 +213,6 @@ export const ReviewWorkspace = ({
         onClearInitialReviewId();
       }
     }
-     
   }, [initialReviewId]);
 
   return (

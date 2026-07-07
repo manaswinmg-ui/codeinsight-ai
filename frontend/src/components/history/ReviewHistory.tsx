@@ -48,7 +48,6 @@ export const ReviewHistory: React.FC<ReviewHistoryProps> = ({
 
   useEffect(() => {
     fetchHistory();
-     
   }, [activeReviewId]); // Re-fetch history when a new review starts or completes
 
   const formatShortDate = (dateStr: string) => {

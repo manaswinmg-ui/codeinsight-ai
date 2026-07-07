@@ -89,8 +89,6 @@ class ReviewListItemResponse(BaseModel):
         from_attributes = True
 
 
-
-
 T = TypeVar("T")
 
 

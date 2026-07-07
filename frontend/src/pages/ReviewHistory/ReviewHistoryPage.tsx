@@ -93,7 +93,6 @@ export const ReviewHistoryPage: React.FC<ReviewHistoryPageProps> = ({
 
   useEffect(() => {
     fetchReviews();
-     
   }, [currentPage, search, sortBy, filters]);
 
   // Reset page to 1 when filters or search change

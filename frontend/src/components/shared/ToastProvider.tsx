@@ -14,7 +14,6 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
- 
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
