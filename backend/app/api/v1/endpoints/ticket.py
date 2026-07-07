@@ -7,7 +7,12 @@ from app.application.ticket_application_service import (
     TicketApplicationService,
     ticket_application_service,
 )
+from app.auth.dependencies import get_optional_current_user
 from app.db import get_db
+from app.models.user import User
+from app.models.enums import TicketStatus
+from app.repositories.ticket_query_repository import ticket_query_repository
+from app.schemas.review import PaginatedResponse
 from app.schemas.ticket import TicketResponse, TicketStatusUpdate
 from app.services.ticket_service import (
     FindingNotFoundError,
@@ -29,13 +34,14 @@ logger = logging.getLogger("app.api.ticket")
 async def create_ticket(
     finding_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_current_user),
     app_service: TicketApplicationService = Depends(
         lambda: ticket_application_service
     ),
 ) -> TicketResponse:
     """Create a bug ticket from a code review finding."""
     try:
-        return await app_service.create_ticket(db, finding_id)
+        return await app_service.create_ticket(db, finding_id, user_id=current_user.id if current_user else None)
     except FindingNotFoundError as fnf_err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -135,6 +141,36 @@ async def update_ticket_status(
             err,
             exc_info=True,
         )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        ) from err
+
+
+@router.get(
+    "/tickets",
+    response_model=PaginatedResponse[TicketResponse],
+    summary="Get paginated list of tickets",
+)
+async def list_tickets(
+    page: int = 1,
+    limit: int = 10,
+    status: TicketStatus | None = None,
+    db: AsyncSession = Depends(get_db),
+) -> PaginatedResponse[TicketResponse]:
+    """Retrieve tickets with optional status filtering and pagination."""
+    try:
+        items, total = await ticket_query_repository.search_tickets(db, page, limit, status)
+        pages = (total + limit - 1) // limit if limit > 0 else 1
+        return PaginatedResponse(
+            items=items,
+            total=total,
+            page=page,
+            limit=limit,
+            pages=pages,
+        )
+    except Exception as err:
+        logger.error("Unexpected error in list tickets API: %s", err, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",

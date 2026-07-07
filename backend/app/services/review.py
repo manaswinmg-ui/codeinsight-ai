@@ -156,7 +156,8 @@ class ReviewService:
         self.repository = review_repository
 
     async def create_review(
-        self, db: AsyncSession, code: str, language: str | None = None
+        self, db: AsyncSession, code: str, language: str | None = None,
+        user_id: int | None = None,
     ) -> Review:
         """Run E2E code review: detect language, prompt AI, parse and persist."""
         resolved_lang = detect_language(code, language)
@@ -184,6 +185,7 @@ class ReviewService:
             language=resolved_lang,
             summary=parsed_payload["summary"],
             raw_response=parsed_payload,
+            user_id=user_id,
         )
 
         return review_record

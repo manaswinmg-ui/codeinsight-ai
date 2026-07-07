@@ -21,12 +21,14 @@ class TicketApplicationService:
         self._ticket_repo = ticket_repo
 
     async def create_ticket(
-        self, db: AsyncSession, finding_id: int
+        self, db: AsyncSession, finding_id: int, user_id: int | None = None
     ) -> TicketResponse:
         """
         Orchestrate ticket creation from a finding.
         """
-        ticket = await self._ticket_svc.create_ticket_from_finding(db, finding_id)
+        ticket = await self._ticket_svc.create_ticket_from_finding(
+            db, finding_id, user_id=user_id
+        )
         return TicketResponse.model_validate(ticket)
 
     async def get_ticket(

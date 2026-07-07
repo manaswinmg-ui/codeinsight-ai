@@ -16,6 +16,7 @@ class ReviewRepository(BaseRepository[Review]):
         language: str,
         summary: str,
         raw_response: dict,
+        user_id: int | None = None,
     ) -> Review:
         """Persist a new review record."""
         db_obj = Review(
@@ -24,6 +25,7 @@ class ReviewRepository(BaseRepository[Review]):
             summary=summary,
             raw_response=raw_response,
             status="completed",
+            user_id=user_id,
         )
         db.add(db_obj)
         await db.commit()

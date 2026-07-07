@@ -10,7 +10,7 @@ class ReviewService:
         self.repository = repository
 
     async def create_review(
-        self, db: AsyncSession, *, code: str, language: str
+        self, db: AsyncSession, *, code: str, language: str, user_id: int | None = None
     ) -> Review:
         """Validate and create a new review record with status PENDING."""
         if not code or not code.strip():
@@ -22,6 +22,7 @@ class ReviewService:
             code=code.strip(),
             language=language.strip(),
             status=ReviewStatus.PENDING,
+            user_id=user_id,
         )
 
         return await self.repository.create(db, review=review)
@@ -35,10 +36,6 @@ class ReviewService:
     ) -> Review | None:
         """Retrieve review with eagerly loaded findings."""
         return await self.repository.get_with_findings(db, review_id)
-
-    async def list_reviews(self, db: AsyncSession) -> list[Review]:
-        """Retrieve all reviews, ordered newest first by repository delegation."""
-        return await self.repository.list_reviews(db)
 
     async def delete_review(self, db: AsyncSession, review_id: int) -> bool:
         """Delete a review by ID."""

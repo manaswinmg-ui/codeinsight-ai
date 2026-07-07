@@ -11,6 +11,7 @@ from app.models.enums import ReviewStatus
 
 if TYPE_CHECKING:
     from app.models.finding import Finding
+    from app.models.user import User
 
 
 class Review(Base):
@@ -24,9 +25,15 @@ class Review(Base):
         sa.Enum(ReviewStatus), default=ReviewStatus.PENDING, nullable=False
     )
 
+    # Owner (nullable for backward compatibility with pre-auth data)
+    user_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
     # Relationships
     findings: Mapped[list[Finding]] = relationship(
         "Finding",
         back_populates="review",
         cascade="all, delete-orphan",
     )
+    owner: Mapped[User | None] = relationship("User", back_populates="reviews")

@@ -31,11 +31,6 @@ class ReviewRepository(BaseRepository[Review]):
         )
         return result.scalars().first()
 
-    async def list_reviews(self, db: AsyncSession) -> list[Review]:
-        """List all Reviews, ordered by creation timestamp descending."""
-        result = await db.execute(select(Review).order_by(Review.created_at.desc()))
-        return list(result.scalars().all())
-
     async def update(self, db: AsyncSession, *, review: Review) -> Review:
         """Persist updates to an existing Review."""
         db.add(review)

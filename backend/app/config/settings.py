@@ -31,5 +31,21 @@ class Settings(BaseSettings):
     AI_MAX_TOKENS: int = 4096
     AI_TIMEOUT: float = 30.0
 
+    # Modular routing & RAG configs
+    OPENAI_DEFAULT_MODEL: str = "gpt-5.4-mini"
+    OPENAI_FALLBACK_MODEL: str = "gpt-5.5"
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    AI_MAX_CONTEXT_SIZE: int = 8192
+    AI_MAX_RETRIEVED_FILES: int = 5
+    AI_SIMILARITY_THRESHOLD: float = 0.3
+    AI_ESCALATION_CONFIDENCE_THRESHOLD: float = 70.0
+    AI_RETRY_COUNT: int = 2
+
+    # JWT / Authentication
+    JWT_SECRET_KEY: str = "supersecretkeychangeinproduction"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
 
 settings = Settings()

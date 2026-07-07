@@ -2,7 +2,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from app.models.enums import FindingCategory, FindingStatus, TicketPriority, TicketStatus
+from app.models.enums import (
+    FindingCategory,
+    FindingStatus,
+    TicketPriority,
+    TicketStatus,
+)
 from app.models.finding import Finding
 from app.models.ticket import Ticket
 from app.services.ticket_service import (

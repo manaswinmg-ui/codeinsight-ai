@@ -69,6 +69,7 @@ class ReviewApplicationService:
         code: str,
         language: str,
         background_tasks: BackgroundTasks,
+        user_id: int | None = None,
     ) -> ReviewResponse:
         """
         Create a new review record in PENDING state and schedule AI processing.
@@ -81,7 +82,9 @@ class ReviewApplicationService:
         Raises:
             ValueError: propagated from ReviewService when input is invalid
         """
-        review = await self._review_svc.create_review(db, code=code, language=language)
+        review = await self._review_svc.create_review(
+            db, code=code, language=language, user_id=user_id
+        )
         background_tasks.add_task(self._run_processing_task, review.id)
 
         return ReviewResponse(

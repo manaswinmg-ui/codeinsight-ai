@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 
-import { CodeEditor } from '../components/CodeEditor';
-import { FileUploader } from '../components/FileUploader';
-import { LanguageSelector } from '../components/LanguageSelector';
-import { ProcessingStatus } from '../components/ProcessingStatus';
-import { ReviewButton } from '../components/ReviewButton';
-import { ReviewResults } from '../components/ReviewResults';
-import { ReviewHistory } from '../components/ReviewHistory';
+import { CodeEditor } from '../components/review/CodeEditor';
+import { FileUploader } from '../components/review/FileUploader';
+import { LanguageSelector } from '../components/review/LanguageSelector';
+import { ProcessingStatus } from '../components/review/ProcessingStatus';
+import { ReviewButton } from '../components/review/ReviewButton';
+
+import { FindingsModal } from '../components/modals/FindingsModal';
 
 export interface Finding {
   id: number;
@@ -40,7 +40,13 @@ export interface ReviewDetail {
   created_at: string;
 }
 
-export const ReviewWorkspace = () => {
+interface ReviewWorkspaceProps {
+  initialReviewId?: number | null;
+  onClearInitialReviewId?: () => void;
+  showDebug?: boolean;
+}
+
+export const ReviewWorkspace = ({ initialReviewId, onClearInitialReviewId, showDebug }: ReviewWorkspaceProps) => {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('python');
   const [fileName, setFileName] = useState<string | null>(null);
@@ -51,6 +57,14 @@ export const ReviewWorkspace = () => {
   const [reviewData, setReviewData] = useState<ReviewDetail | null>(null);
   const [activeReviewId, setActiveReviewId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isFindingsModalOpen, setIsFindingsModalOpen] = useState(false);
+
+  // Automatically open the findings modal when a review finishes successfully
+  useEffect(() => {
+    if (status === 'success' && reviewData) {
+      setIsFindingsModalOpen(true);
+    }
+  }, [status, reviewData]);
 
   // Poll review status when activeReviewId is set
   useEffect(() => {
@@ -182,17 +196,20 @@ export const ReviewWorkspace = () => {
     }
   };
 
-  return (
-    <div className="workspace-container" style={{ display: 'flex', gap: '28px', minHeight: '85vh', alignItems: 'stretch' }}>
-      {/* Collapsible Left History Sidebar */}
-      <ReviewHistory
-        onSelectReview={handleLoadReview}
-        activeReviewId={activeReviewId}
-        currentLoadedId={reviewData?.id || null}
-      />
+  useEffect(() => {
+    if (initialReviewId) {
+      handleLoadReview(initialReviewId);
+      if (onClearInitialReviewId) {
+        onClearInitialReviewId();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialReviewId]);
 
+  return (
+    <div className="workspace-container" style={{ minHeight: '85vh' }}>
       {/* Main Content Workspace */}
-      <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
         {/* Page Header */}
         <header
           style={{
@@ -283,6 +300,24 @@ export const ReviewWorkspace = () => {
                 disabled={!code.trim()}
                 loading={status === 'processing'}
               />
+              {status === 'success' && reviewData && (
+                <button
+                  onClick={() => setIsFindingsModalOpen(true)}
+                  className="btn"
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '12px 24px',
+                    fontSize: '1.05rem',
+                    fontWeight: 700,
+                    height: '48px',
+                    background: 'var(--success-color)',
+                    boxShadow: '0 4px 14px 0 rgba(16, 185, 129, 0.25)',
+                  }}
+                >
+                  🔎 View Findings (#{reviewData.id})
+                </button>
+              )}
               {status === 'error' && error && (
                 <div
                   style={{
@@ -301,15 +336,19 @@ export const ReviewWorkspace = () => {
             </div>
 
             <ProcessingStatus status={status} currentStep={currentStep} />
-
-            <ReviewResults
-              status={status}
-              reviewData={reviewData}
-              setReviewData={setReviewData}
-            />
           </section>
         </div>
       </div>
+
+      {/* Findings Modal Dialog */}
+      <FindingsModal
+        isOpen={isFindingsModalOpen}
+        onClose={() => setIsFindingsModalOpen(false)}
+        reviewData={reviewData}
+        status={status}
+        setReviewData={setReviewData}
+        showDebug={showDebug ?? false}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+
 from app.ai.client import AIClient, get_ai_client
 from app.ai.prompt_builder import PromptBuilder
 from app.ai.response_parser import ResponseParser, ReviewResult
@@ -30,7 +31,7 @@ class AIReviewPipeline:
         """Execute full E2E hybrid pipeline logic: Static Analysis + AI Review -> Validate -> Parse -> Merge."""
         static_findings = []
         static_task = None
-        
+
         try:
             analyzer = get_analyzer(review.language)
             static_task = asyncio.create_task(analyzer.analyze(review.code))
@@ -45,14 +46,14 @@ class AIReviewPipeline:
                 self.ai_client.review(prompt_package),
                 return_exceptions=True
             )
-            
+
             static_res, raw_response = results[0], results[1]
-            
+
             if isinstance(static_res, Exception):
                 logger.error("Static analysis execution failed: %s", static_res)
             else:
                 static_findings = static_res
-                
+
             if isinstance(raw_response, Exception):
                 raise raw_response
         else:

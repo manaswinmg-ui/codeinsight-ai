@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -80,7 +80,7 @@ class TicketService:
         return TicketPriority.P2
 
     async def create_ticket_from_finding(
-        self, db: AsyncSession, finding_id: int
+        self, db: AsyncSession, finding_id: int, user_id: int | None = None,
     ) -> Ticket:
         """
         Domain logic to create a new ticket from an AI Finding.
@@ -111,6 +111,7 @@ class TicketService:
             description=finding.description,
             priority=priority,
             status=TicketStatus.OPEN,
+            user_id=user_id,
         )
 
         # 5. Persist Ticket
@@ -151,7 +152,7 @@ class TicketService:
 
         # Auto-set resolved_at and resolution_notes for terminal-like states
         if new_status in (TicketStatus.DONE, TicketStatus.CLOSED):
-            ticket.resolved_at = datetime.now(timezone.utc)
+            ticket.resolved_at = datetime.now(UTC)
             if resolution_notes:
                 ticket.resolution_notes = resolution_notes
         else:

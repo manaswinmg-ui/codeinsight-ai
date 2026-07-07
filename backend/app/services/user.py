@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
 from app.repositories.user import UserRepository, user_repository
-from app.schemas.user import UserCreate
 from app.services.base import BaseService
 
 
@@ -16,8 +15,8 @@ class UserService(BaseService[UserRepository]):
     async def get_by_email(self, db: AsyncSession, email: str) -> User | None:
         return await self.repository.get_by_email(db, email)
 
-    async def create_user(self, db: AsyncSession, user_in: UserCreate) -> User:
-        return await self.repository.create_user(db, obj_in=user_in)
+    async def get_by_username(self, db: AsyncSession, username: str) -> User | None:
+        return await self.repository.get_by_username(db, username)
 
 
 user_service = UserService()

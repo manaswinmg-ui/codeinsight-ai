@@ -1,0 +1,4 @@
+- [x] Configure API key settings in `.env`
+- [x] Implement ESLint integration in `JavaScriptAnalyzer`
+- [x] Write automated tests for `JavaScriptAnalyzer`
+- [/] Verify that ESLint integration works and findings are produced

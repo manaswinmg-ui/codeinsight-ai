@@ -68,3 +68,53 @@ class ReviewListItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+from typing import Generic, Literal, TypeVar
+
+T = TypeVar("T")
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    items: list[T]
+    total: int
+    page: int
+    limit: int
+    pages: int
+
+
+class ReviewSearchQuery(BaseModel):
+    page: int = 1
+    limit: int = 10
+    search: str | None = None
+    status: str | None = None
+    language: str | None = None
+    quality_min: int | None = None
+    quality_max: int | None = None
+    critical_only: bool = False
+    has_tickets: bool | None = None
+    sort_by: Literal["newest", "oldest", "highest_quality", "lowest_quality", "most_findings", "least_findings"] = "newest"
+
+
+class ReviewCompareRequest(BaseModel):
+    left_review_id: int = Field(..., description="ID of the base review")
+    right_review_id: int = Field(..., description="ID of the review to compare against")
+
+
+class FindingComparisonItem(BaseModel):
+    id: int
+    title: str
+    severity: str
+    category: str
+    line_start: int | None = None
+
+
+class ReviewComparisonResponse(BaseModel):
+    left_review_id: int
+    right_review_id: int
+    quality_difference: int
+    new_findings: list[FindingComparisonItem]
+    resolved_findings: list[FindingComparisonItem]
+    critical_fixed_count: int
+    tickets_closed_count: int
+

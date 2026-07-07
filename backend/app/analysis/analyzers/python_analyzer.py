@@ -5,6 +5,7 @@ import os
 import shutil
 import sys
 import uuid
+
 from app.analysis.analyzers.base import BaseAnalyzer
 from app.analysis.models import StaticFinding
 
@@ -26,12 +27,12 @@ class PythonAnalyzer(BaseAnalyzer):
                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             )
             venv_dir = os.path.join(backend_dir, ".venv")
-            
+
             if sys.platform == "win32":
                 candidate = os.path.join(venv_dir, "Scripts", "ruff.exe")
             else:
                 candidate = os.path.join(venv_dir, "bin", "ruff")
-                
+
             if os.path.exists(candidate):
                 ruff_path = candidate
             else:
@@ -41,13 +42,13 @@ class PythonAnalyzer(BaseAnalyzer):
     async def analyze(self, code: str) -> list[StaticFinding]:
         """Run Ruff on a temporary file and parse the JSON output."""
         ruff_path = self._get_ruff_path()
-        
+
         # Setup workspace temp directory
         backend_dir = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         )
         temp_dir = os.path.join(backend_dir, ".temp_analysis")
-        
+
         try:
             os.makedirs(temp_dir, exist_ok=True)
         except Exception as e:
@@ -55,7 +56,7 @@ class PythonAnalyzer(BaseAnalyzer):
             return []
 
         temp_file_path = os.path.join(temp_dir, f"temp_{uuid.uuid4().hex}.py")
-        
+
         try:
             with open(temp_file_path, "w", encoding="utf-8") as f:
                 f.write(code)
@@ -73,7 +74,7 @@ class PythonAnalyzer(BaseAnalyzer):
             )
             try:
                 stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=10.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.error("Ruff static analysis execution timed out.")
                 # Terminate the process if timeout occurs
                 try:
@@ -83,7 +84,7 @@ class PythonAnalyzer(BaseAnalyzer):
                 return []
 
             stdout_str = stdout.decode("utf-8", errors="ignore").strip()
-            
+
             if not stdout_str:
                 return []
 
@@ -113,7 +114,7 @@ class PythonAnalyzer(BaseAnalyzer):
                 # Severity mapping
                 is_syntax_error = code_val in ("E999", "syntax-error", "invalid-syntax")
                 raw_severity = str(diag.get("severity", "warning")).lower()
-                
+
                 if is_syntax_error:
                     severity = "critical"
                 elif raw_severity == "error":

@@ -12,6 +12,7 @@ from app.models.enums import TicketPriority, TicketStatus
 
 if TYPE_CHECKING:
     from app.models.finding import Finding
+    from app.models.user import User
 
 
 class Ticket(Base):
@@ -43,5 +44,11 @@ class Ticket(Base):
     )
     resolution_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # Owner (nullable for backward compatibility with pre-auth data)
+    user_id: Mapped[int | None] = mapped_column(
+        sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
     # Relationships
     finding: Mapped[Finding] = relationship("Finding", back_populates="ticket")
+    owner: Mapped[User | None] = relationship("User", back_populates="tickets")

@@ -1,7 +1,6 @@
-import pytest
 from app.ai.response_parser import Finding
-from app.analysis.models import StaticFinding
 from app.analysis.merger import FindingMerger
+from app.analysis.models import StaticFinding
 
 
 def test_merger_static_to_finding_mapping() -> None:
@@ -28,7 +27,7 @@ def test_merger_static_to_finding_mapping() -> None:
 
 def test_merger_deduplicate_same_title() -> None:
     merger = FindingMerger()
-    
+
     sf = StaticFinding(
         title="Unused Import",
         description="unused import os",
@@ -46,7 +45,7 @@ def test_merger_deduplicate_same_title() -> None:
         line_end=2,
         confidence=80
     )
-    
+
     merged = merger.merge([sf], [ai_finding])
     assert len(merged) == 1
     assert merged[0].severity == "MEDIUM"
@@ -55,7 +54,7 @@ def test_merger_deduplicate_same_title() -> None:
 
 def test_merger_deduplicate_same_line_similar_description() -> None:
     merger = FindingMerger()
-    
+
     sf = StaticFinding(
         title="Ruff F401",
         description="`os` is imported but never used in the module",
@@ -73,7 +72,7 @@ def test_merger_deduplicate_same_line_similar_description() -> None:
         line_end=3,
         confidence=90
     )
-    
+
     merged = merger.merge([sf], [ai_finding])
     assert len(merged) == 1
     assert merged[0].confidence == 100
@@ -81,7 +80,7 @@ def test_merger_deduplicate_same_line_similar_description() -> None:
 
 def test_merger_no_deduplicate_different_lines() -> None:
     merger = FindingMerger()
-    
+
     sf = StaticFinding(
         title="Unused Import",
         description="unused import os",
@@ -99,14 +98,14 @@ def test_merger_no_deduplicate_different_lines() -> None:
         line_end=15,
         confidence=80
     )
-    
+
     merged = merger.merge([sf], [ai_finding])
     assert len(merged) == 2
 
 
 def test_merger_severity_sorting() -> None:
     merger = FindingMerger()
-    
+
     sf1 = StaticFinding(
         title="Medium Issue",
         description="desc",
@@ -133,7 +132,7 @@ def test_merger_severity_sorting() -> None:
         line_end=4,
         confidence=90
     )
-    
+
     merged = merger.merge([sf1, sf2], [ai1])
     assert len(merged) == 3
     assert merged[0].severity == "CRITICAL"
@@ -143,7 +142,7 @@ def test_merger_severity_sorting() -> None:
 
 def test_merger_line_inheritance() -> None:
     merger = FindingMerger()
-    
+
     sf = StaticFinding(
         title="Unused Import",
         description="unused import os",
@@ -162,7 +161,7 @@ def test_merger_line_inheritance() -> None:
         line_end=None,
         confidence=95
     )
-    
+
     merged = merger.merge([sf], [ai])
     assert len(merged) == 1
     assert merged[0].confidence == 95

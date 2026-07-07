@@ -57,7 +57,6 @@ async def test_submit_code_review_validation_empty_lang(client: AsyncClient) -> 
 @pytest.mark.asyncio
 async def test_get_review_details_success(client: AsyncClient) -> None:
     """Test successful retrieval of code review details and findings."""
-    from app.models.finding import Finding
     from app.models.enums import FindingStatus
 
     mock_findings = [
