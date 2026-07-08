@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ReviewDetail } from '../../pages/ReviewWorkspace';
 import { QualityGauge } from '../shared/QualityGauge';
+import { SeverityChart } from '../shared/SeverityChart';
 
 interface ReviewSummaryCardProps {
   reviewData: ReviewDetail;
@@ -170,6 +171,19 @@ export const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Severity distribution section */}
+      {totalFindings > 0 && (
+        <div
+          className="glass-card"
+          style={{
+            padding: '24px',
+            background: 'rgba(255, 255, 255, 0.01)',
+          }}
+        >
+          <SeverityChart findings={reviewData.findings} />
+        </div>
+      )}
 
       {/* Grid of details */}
       <div

@@ -29,6 +29,7 @@ class Review(Base):
     user_id: Mapped[int | None] = mapped_column(
         sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
+    quality_score: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
 
     # Relationships
     findings: Mapped[list[Finding]] = relationship(

@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     AI_TIMEOUT: float = 30.0
 
     # Modular routing & RAG configs
-    OPENAI_DEFAULT_MODEL: str = "gpt-5.4-mini"
-    OPENAI_FALLBACK_MODEL: str = "gpt-5.5"
+    OPENAI_DEFAULT_MODEL: str = "gpt-4o-mini"
+    OPENAI_FALLBACK_MODEL: str = "gpt-4o"
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
     AI_MAX_CONTEXT_SIZE: int = 8192
     AI_MAX_RETRIEVED_FILES: int = 5

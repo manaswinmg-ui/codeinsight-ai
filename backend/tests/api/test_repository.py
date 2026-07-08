@@ -119,7 +119,7 @@ async def test_query_repository_endpoint(
 
     mock_result = {
         "answer": "Mocked answer",
-        "model_used": "gpt-5.4-mini",
+        "model_used": "gpt-4o-mini",
         "cost": 0.0001,
         "escalated": False,
         "reason": "Test route",
@@ -144,7 +144,7 @@ async def test_query_repository_endpoint(
         assert response.status_code == 200
         data = response.json()
         assert data["answer"] == "Mocked answer"
-        assert data["model_used"] == "gpt-5.4-mini"
+        assert data["model_used"] == "gpt-4o-mini"
         assert data["escalated"] is False
         assert data["files_retrieved"] == ["src/main.py"]
 

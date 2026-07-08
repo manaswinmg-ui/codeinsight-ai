@@ -16,7 +16,7 @@ class MockAIProvider(AIProvider):
     ) -> str:
         # Return different responses to test routing and escalation paths
         p_lower = user_prompt.lower()
-        if "5.5" in model:
+        if model.lower() == "gpt-4o":
             return f"Mock reply from {model} to question: {user_prompt[:50]}..."
 
         if "escalate_insufficient" in p_lower:
@@ -27,7 +27,7 @@ class MockAIProvider(AIProvider):
                 {"response": "This is a low confidence response.", "confidence": 45}
             )
 
-        if "raise_api_error" in p_lower and "5.4" in model:
+        if "raise_api_error" in p_lower and model.lower() == "gpt-4o-mini":
             from app.ai.providers.base import AIError
 
             raise AIError("Mock API error on primary model")

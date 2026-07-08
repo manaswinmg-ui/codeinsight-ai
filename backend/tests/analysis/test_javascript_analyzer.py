@@ -50,7 +50,7 @@ async def test_javascript_analyzer_analyze_success() -> None:
         f = findings[0]
         assert f.tool == "eslint"
         assert f.rule == "@typescript-eslint/no-unused-vars"
-        assert f.severity == "medium"
+        assert f.severity == "low"
         assert f.category == "BEST_PRACTICE"
         assert f.line == 1
         assert (

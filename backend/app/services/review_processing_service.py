@@ -7,6 +7,7 @@ from app.ai.review_pipeline import AIReviewPipeline
 from app.mappers.finding_mapper import FindingMapper
 from app.models.enums import ReviewStatus
 from app.repositories.finding_repository import FindingRepository, finding_repository
+from app.repositories.review_query_repository import compute_quality_score
 from app.repositories.review_repository import ReviewRepository, review_repository
 
 logger = logging.getLogger("app.services.review_processing")
@@ -51,6 +52,7 @@ class ReviewProcessingService:
 
             # Transition PROCESSING -> COMPLETED
             review.status = ReviewStatus.COMPLETED
+            review.quality_score = compute_quality_score(finding_entities)
             await self.repository.update(db, review=review)
             logger.info(f"Review {review_id} completed successfully.")
 

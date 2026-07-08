@@ -1,7 +1,6 @@
 from typing import Any
 
 from app.models.repository import FileReview
-from app.repositories.review_query_repository import compute_quality_score
 
 
 class RepositorySummary:
@@ -54,7 +53,14 @@ class RepositorySummary:
 
             if review.status == "COMPLETED":
                 completed_files += 1
-                quality_score = compute_quality_score(findings)
+                if review.quality_score is not None:
+                    quality_score = review.quality_score
+                else:
+                    from app.repositories.review_query_repository import (
+                        compute_quality_score,
+                    )
+
+                    quality_score = compute_quality_score(findings)
                 total_quality_score += quality_score
             else:
                 quality_score = 0

@@ -24,8 +24,8 @@ async def test_python_analyzer_analyze_success() -> None:
     f = findings[0]
     assert f.tool == "ruff"
     assert f.rule == "F401"
-    assert f.severity == "high"
-    assert f.category == "BEST_PRACTICE"
+    assert f.severity == "low"
+    assert f.category == "MAINTAINABILITY"
     assert f.line == 1
     assert "unused" in f.description.lower() or "os" in f.description.lower()
 

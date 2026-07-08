@@ -152,23 +152,29 @@ class JavaScriptAnalyzer(BaseAnalyzer):
 
                     title = f"ESLint ({rule_code}): {rule_title}"
 
-                    # Severity mapping
+                    # Severity and Category mapping based on rules
                     raw_severity = msg.get("severity", 1)
-                    if is_fatal:
-                        severity = "critical"
-                    elif raw_severity == 2:
-                        severity = "high"
-                    else:
-                        severity = "medium"
+                    if raw_severity == 0:
+                        continue
 
-                    # Category mapping
                     rule_lower = rule_code.lower()
-                    if is_fatal:
+
+                    if is_fatal or "parsing" in rule_lower or "syntax" in rule_lower:
+                        severity = "critical"
                         category = "BUG"
                     elif any(
                         k in rule_lower
-                        for k in ["eval", "security", "xss", "csrf", "injection"]
+                        for k in [
+                            "eval",
+                            "security",
+                            "xss",
+                            "csrf",
+                            "injection",
+                            "no-implied-eval",
+                            "no-new-func",
+                        ]
                     ):
+                        severity = "high"
                         category = "SECURITY"
                     elif any(
                         k in rule_lower
@@ -179,10 +185,50 @@ class JavaScriptAnalyzer(BaseAnalyzer):
                             "rules-of-hooks",
                             "no-empty",
                             "no-constant-condition",
+                            "no-cond-assign",
+                            "no-dupe-keys",
+                            "no-func-assign",
                         ]
                     ):
+                        severity = "high"
                         category = "BUG"
+                    elif any(
+                        k in rule_lower
+                        for k in [
+                            "semi",
+                            "indent",
+                            "quotes",
+                            "comma",
+                            "eol",
+                            "whitespace",
+                            "spacing",
+                            "curly",
+                            "max-len",
+                            "no-trailing-spaces",
+                            "padded-blocks",
+                        ]
+                    ):
+                        severity = "low"
+                        category = "READABILITY"
+                    elif any(
+                        k in rule_lower
+                        for k in [
+                            "no-unused-vars",
+                            "no-console",
+                            "no-debugger",
+                            "no-empty-function",
+                        ]
+                    ):
+                        severity = "low"
+                        category = "BEST_PRACTICE"
+                    elif "import/" in rule_lower or "require" in rule_lower:
+                        severity = "low"
+                        category = "MAINTAINABILITY"
                     else:
+                        if raw_severity == 2:
+                            severity = "high"
+                        else:
+                            severity = "medium"
                         category = "BEST_PRACTICE"
 
                     finding = StaticFinding(

@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.finding import Finding
 from app.repositories.review_query_repository import (
     ReviewQueryRepository,
-    compute_quality_score,
     review_query_repository,
 )
 from app.schemas.dashboard import ReviewSummary
@@ -102,8 +101,20 @@ class ReviewHistoryApplicationService:
         left_findings = left_review.findings or []
         right_findings = right_review.findings or []
 
-        left_score = compute_quality_score(left_findings)
-        right_score = compute_quality_score(right_findings)
+        if left_review.quality_score is not None:
+            left_score = left_review.quality_score
+        else:
+            from app.repositories.review_query_repository import compute_quality_score
+
+            left_score = compute_quality_score(left_findings)
+
+        if right_review.quality_score is not None:
+            right_score = right_review.quality_score
+        else:
+            from app.repositories.review_query_repository import compute_quality_score
+
+            right_score = compute_quality_score(right_findings)
+
         quality_diff = right_score - left_score
 
         # Identify matches

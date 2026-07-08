@@ -105,7 +105,7 @@ class TicketService:
             2. The finding does not already have a ticket linked
         """
         # 1. Validate finding exists
-        finding = await self._finding_repo.get(db, finding_id)
+        finding = await self._finding_repo.get_with_review(db, finding_id)
         if not finding:
             raise FindingNotFoundError(f"Finding with ID {finding_id} not found")
 
@@ -119,11 +119,53 @@ class TicketService:
         # 3. Map severity to priority
         priority = self.map_priority(finding.severity)
 
+        # Build rich markdown description for the ticket
+        description_parts = [
+            finding.description,
+            "\n### AI Finding Details",
+            f"* **Category**: {finding.category.name if hasattr(finding.category, 'name') else str(finding.category)}",
+            f"* **Severity**: {finding.severity.upper()}",
+        ]
+
+        if finding.confidence is not None:
+            description_parts.append(f"* **Confidence**: {finding.confidence}%")
+        if finding.estimated_fix_time:
+            description_parts.append(
+                f"* **Estimated Fix Time**: {finding.estimated_fix_time}"
+            )
+
+        if finding.impact:
+            description_parts.extend(["\n### Impact", finding.impact])
+
+        if finding.why_it_matters:
+            description_parts.extend(["\n### Why It Matters", finding.why_it_matters])
+
+        if finding.suggested_fix:
+            description_parts.extend(["\n### Suggested Fix", finding.suggested_fix])
+
+        if finding.improved_code:
+            lang_block = finding.review.language.lower() if finding.review else "code"
+            description_parts.extend(
+                [
+                    "\n### Improved Implementation",
+                    f"```{lang_block}\n{finding.improved_code}\n```",
+                ]
+            )
+
+        if finding.test_case_hint:
+            description_parts.extend(["\n### Test Case Hint", finding.test_case_hint])
+
+        if finding.references:
+            refs = [f"* {ref}" for ref in finding.references]
+            description_parts.extend(["\n### References", "\n".join(refs)])
+
+        rich_description = "\n".join([p for p in description_parts if p is not None])
+
         # 4. Instantiate Ticket
         ticket = Ticket(
             finding_id=finding.id,
             title=finding.title,
-            description=finding.description,
+            description=rich_description,
             priority=priority,
             status=TicketStatus.OPEN,
             user_id=user_id,
@@ -170,9 +212,23 @@ class TicketService:
             ticket.resolved_at = datetime.now(UTC)
             if resolution_notes:
                 ticket.resolution_notes = resolution_notes
+            if ticket.finding:
+                from app.models.enums import FindingStatus
+
+                ticket.finding.status = FindingStatus.RESOLVED
+        elif new_status in (TicketStatus.IN_PROGRESS, TicketStatus.IN_REVIEW):
+            ticket.resolved_at = None
+            if ticket.finding:
+                from app.models.enums import FindingStatus
+
+                ticket.finding.status = FindingStatus.ACKNOWLEDGED
         else:
             # Clear resolved_at if reopening
             ticket.resolved_at = None
+            if ticket.finding:
+                from app.models.enums import FindingStatus
+
+                ticket.finding.status = FindingStatus.OPEN
 
         db.add(ticket)
         await db.commit()

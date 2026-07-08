@@ -195,6 +195,8 @@ def is_relevant_finding(f: Finding) -> bool:
         return False
 
     title_lower = f.title.lower().strip()
+    desc_lower = f.description.lower().strip()
+
     noise_patterns = [
         "no issues found",
         "no vulnerabilities",
@@ -205,9 +207,18 @@ def is_relevant_finding(f: Finding) -> bool:
         "no security issues",
         "everything is fine",
         "no findings",
+        "no errors",
+        "no eslint errors",
+        "no ruff errors",
+        "eslint passed",
+        "ruff passed",
+        "no issues",
+        "no problems",
+        "no rule violations",
+        "clean code",
     ]
     for pattern in noise_patterns:
-        if pattern in title_lower:
+        if pattern in title_lower or pattern in desc_lower:
             return False
 
     # Discard low-confidence AI suggestions

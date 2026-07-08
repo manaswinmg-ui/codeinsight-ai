@@ -48,11 +48,11 @@ def test_token_optimizer_should_ignore():
 
 def test_cost_logger_calculation():
     # Primary: $0.15/1M in, $0.60/1M out
-    cost = CostLogger.calculate_cost("gpt-5.4-mini", 1_000_000, 1_000_000)
+    cost = CostLogger.calculate_cost("gpt-4o-mini", 1_000_000, 1_000_000)
     assert abs(cost - 0.75) < 1e-9
 
     # Fallback: $2.50/1M in, $10.00/1M out
-    fallback_cost = CostLogger.calculate_cost("gpt-5.5", 1_000_000, 1_000_000)
+    fallback_cost = CostLogger.calculate_cost("gpt-4o", 1_000_000, 1_000_000)
     assert abs(fallback_cost - 12.50) < 1e-9
 
 
@@ -94,9 +94,9 @@ async def test_router_normal_routing():
 
         result = await router.query_repository(db, 1, "How does it work?")
 
-        assert result["model_used"] == "gpt-5.4-mini"
+        assert result["model_used"] == "gpt-4o-mini"
         assert result["escalated"] is False
-        assert "gpt-5.4-mini" in result["answer"]
+        assert "gpt-4o-mini" in result["answer"]
         assert "src/main.py" in result["files_retrieved"]
 
 
@@ -117,9 +117,9 @@ async def test_router_escalate_on_complexity():
             db, 1, "Run a security audit on this project."
         )
 
-        assert result["model_used"] == "gpt-5.5"
+        assert result["model_used"] == "gpt-4o"
         assert result["escalated"] is True
-        assert "gpt-5.5" in result["answer"]
+        assert "gpt-4o" in result["answer"]
         assert "Security audit" in result["reason"]
 
 
@@ -138,9 +138,9 @@ async def test_router_escalate_on_insufficient_context():
         # "escalate_insufficient" is mocked to return insufficient context phrase
         result = await router.query_repository(db, 1, "escalate_insufficient")
 
-        assert result["model_used"] == "gpt-5.5"
+        assert result["model_used"] == "gpt-4o"
         assert result["escalated"] is True
-        assert "gpt-5.5" in result["answer"]
+        assert "gpt-4o" in result["answer"]
         assert "insufficient context" in result["reason"]
 
 
@@ -159,9 +159,9 @@ async def test_router_escalate_on_low_confidence():
         # "escalate_low_confidence" is mocked to return a JSON with confidence = 45
         result = await router.query_repository(db, 1, "escalate_low_confidence")
 
-        assert result["model_used"] == "gpt-5.5"
+        assert result["model_used"] == "gpt-4o"
         assert result["escalated"] is True
-        assert "gpt-5.5" in result["answer"]
+        assert "gpt-4o" in result["answer"]
         assert "Confidence score" in result["reason"]
 
 
@@ -180,7 +180,7 @@ async def test_router_escalate_on_primary_failure():
         # "raise_api_error" is mocked to raise AIError on primary model
         result = await router.query_repository(db, 1, "raise_api_error")
 
-        assert result["model_used"] == "gpt-5.5"
+        assert result["model_used"] == "gpt-4o"
         assert result["escalated"] is True
-        assert "gpt-5.5" in result["answer"]
+        assert "gpt-4o" in result["answer"]
         assert "failed with error" in result["reason"]

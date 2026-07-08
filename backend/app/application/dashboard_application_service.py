@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.review_query_repository import (
     ReviewQueryRepository,
-    compute_quality_score,
     review_query_repository,
 )
 from app.repositories.ticket_query_repository import (
@@ -42,7 +41,14 @@ class DashboardApplicationService:
         reviews = await self.review_query_repo.get_recent_reviews(db, limit)
         summaries = []
         for r in reviews:
-            quality_score = compute_quality_score(r.findings)
+            if r.quality_score is not None:
+                quality_score = r.quality_score
+            else:
+                from app.repositories.review_query_repository import (
+                    compute_quality_score,
+                )
+
+                quality_score = compute_quality_score(r.findings)
             open_tickets_count = sum(
                 1
                 for f in r.findings

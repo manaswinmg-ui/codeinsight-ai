@@ -61,7 +61,10 @@ class PromptBuilder:
             "  ]\n"
             "}\n\n"
             "IMPORTANT: For each finding, include the approximate line_start and line_end "
-            "numbers in the source code where the issue occurs. Use 1-based line numbering."
+            "numbers in the source code where the issue occurs. Use 1-based line numbering.\n"
+            "If the code is clean, well-written, and has no bugs, security vulnerabilities, "
+            "performance issues, or significant maintainability concerns, the 'findings' "
+            "list must be empty [] and 'quality_score' must be set to 100. Do not invent or hallucinate issues."
         )
 
         metadata = {

@@ -115,25 +115,57 @@ class PythonAnalyzer(BaseAnalyzer):
 
                 title = f"Ruff ({code_val}): {name.replace('_', ' ').replace('-', ' ').title()}"
 
-                # Severity mapping
+                # Severity and Category mapping based on Ruff codes
                 is_syntax_error = code_val in ("E999", "syntax-error", "invalid-syntax")
                 raw_severity = str(diag.get("severity", "warning")).lower()
 
-                if is_syntax_error:
+                if is_syntax_error or "syntax" in code_val.lower():
                     severity = "critical"
-                elif raw_severity == "error":
-                    severity = "high"
-                else:
-                    severity = "medium"
-
-                # Category mapping
-                if code_val.startswith("S"):
-                    category = "SECURITY"
-                elif code_val.startswith("PL"):
-                    category = "MAINTAINABILITY"
-                elif is_syntax_error:
                     category = "BUG"
+                elif code_val.startswith("S"):
+                    severity = "high"
+                    category = "SECURITY"
+                elif code_val.startswith("F"):
+                    # Pyflakes: F821 (undefined name) is high severity BUG, but F401 (unused import) is low severity MAINTAINABILITY
+                    if code_val in ("F821", "F822", "F823"):
+                        severity = "high"
+                        category = "BUG"
+                    elif code_val in ("F401", "F841"):
+                        severity = "low"
+                        category = "MAINTAINABILITY"
+                    else:
+                        severity = "medium"
+                        category = "BUG"
+                elif code_val.startswith(("E", "W")):
+                    severity = "low"
+                    category = "READABILITY"
+                elif code_val.startswith("I"):
+                    severity = "low"
+                    category = "READABILITY"
+                elif code_val.startswith("N"):
+                    severity = "low"
+                    category = "READABILITY"
+                elif code_val.startswith("D"):
+                    severity = "info"
+                    category = "DOCUMENTATION"
+                elif code_val.startswith("UP"):
+                    severity = "low"
+                    category = "BEST_PRACTICE"
+                elif code_val.startswith("PL"):
+                    if code_val.startswith("PLE"):
+                        severity = "high"
+                        category = "BUG"
+                    elif code_val.startswith("PLW"):
+                        severity = "medium"
+                        category = "MAINTAINABILITY"
+                    else:
+                        severity = "low"
+                        category = "MAINTAINABILITY"
                 else:
+                    if raw_severity == "error":
+                        severity = "high"
+                    else:
+                        severity = "medium"
                     category = "BEST_PRACTICE"
 
                 finding = StaticFinding(

@@ -41,7 +41,7 @@ async def test_create_ticket_from_finding_success() -> None:
     )
 
     mock_finding_repo = MagicMock()
-    mock_finding_repo.get = AsyncMock(return_value=mock_finding)
+    mock_finding_repo.get_with_review = AsyncMock(return_value=mock_finding)
 
     mock_ticket_repo = MagicMock()
     mock_ticket_repo.get_by_finding_id = AsyncMock(return_value=None)
@@ -56,11 +56,12 @@ async def test_create_ticket_from_finding_success() -> None:
 
     assert ticket.finding_id == 123
     assert ticket.title == "SQL Injection"
-    assert ticket.description == "SQL injection in queries."
+    assert "SQL injection in queries." in ticket.description
+    assert "AI Finding Details" in ticket.description
     assert ticket.priority == TicketPriority.P1
     assert ticket.status == TicketStatus.OPEN
 
-    mock_finding_repo.get.assert_called_once_with(db, 123)
+    mock_finding_repo.get_with_review.assert_called_once_with(db, 123)
     mock_ticket_repo.get_by_finding_id.assert_called_once_with(db, 123)
     mock_ticket_repo.create.assert_called_once()
 
@@ -68,7 +69,7 @@ async def test_create_ticket_from_finding_success() -> None:
 @pytest.mark.asyncio
 async def test_create_ticket_from_finding_not_found() -> None:
     mock_finding_repo = MagicMock()
-    mock_finding_repo.get = AsyncMock(return_value=None)
+    mock_finding_repo.get_with_review = AsyncMock(return_value=None)
 
     mock_ticket_repo = MagicMock()
 
@@ -81,7 +82,7 @@ async def test_create_ticket_from_finding_not_found() -> None:
         await service.create_ticket_from_finding(db, 999)
 
     assert "Finding with ID 999 not found" in str(exc_info.value)
-    mock_finding_repo.get.assert_called_once_with(db, 999)
+    mock_finding_repo.get_with_review.assert_called_once_with(db, 999)
 
 
 @pytest.mark.asyncio
@@ -97,7 +98,7 @@ async def test_create_ticket_from_finding_already_exists() -> None:
     mock_ticket = Ticket(id=456, finding_id=123)
 
     mock_finding_repo = MagicMock()
-    mock_finding_repo.get = AsyncMock(return_value=mock_finding)
+    mock_finding_repo.get_with_review = AsyncMock(return_value=mock_finding)
 
     mock_ticket_repo = MagicMock()
     mock_ticket_repo.get_by_finding_id = AsyncMock(return_value=mock_ticket)
@@ -111,7 +112,7 @@ async def test_create_ticket_from_finding_already_exists() -> None:
         await service.create_ticket_from_finding(db, 123)
 
     assert "Ticket already exists for Finding 123" in str(exc_info.value)
-    mock_finding_repo.get.assert_called_once_with(db, 123)
+    mock_finding_repo.get_with_review.assert_called_once_with(db, 123)
     mock_ticket_repo.get_by_finding_id.assert_called_once_with(db, 123)
 
 
@@ -180,3 +181,37 @@ async def test_validate_and_update_status_resolution_notes() -> None:
     assert updated.status == TicketStatus.DONE
     assert updated.resolved_at is not None
     assert updated.resolution_notes == "Fixed SQL injection using parameterized query"
+
+
+@pytest.mark.asyncio
+async def test_validate_and_update_status_finding_sync() -> None:
+    # Arrange
+    mock_finding = Finding(
+        id=123,
+        status=FindingStatus.OPEN,
+    )
+    mock_ticket = Ticket(
+        id=456,
+        finding_id=123,
+        status=TicketStatus.OPEN,
+        finding=mock_finding,
+    )
+    mock_ticket_repo = MagicMock()
+    mock_ticket_repo.get_by_id = AsyncMock(return_value=mock_ticket)
+
+    service = TicketService(finding_repo=MagicMock(), ticket_repo=mock_ticket_repo)
+    db = AsyncMock()
+    db.add = MagicMock()
+
+    # Act 1: Transition OPEN -> IN_PROGRESS should sync finding to ACKNOWLEDGED
+    updated = await service.validate_and_update_status(
+        db, 456, TicketStatus.IN_PROGRESS
+    )
+    assert updated.status == TicketStatus.IN_PROGRESS
+    assert mock_finding.status == FindingStatus.ACKNOWLEDGED
+
+    # Act 2: Transition IN_PROGRESS -> IN_REVIEW -> DONE should sync finding to RESOLVED
+    mock_ticket.status = TicketStatus.IN_REVIEW
+    updated = await service.validate_and_update_status(db, 456, TicketStatus.DONE)
+    assert updated.status == TicketStatus.DONE
+    assert mock_finding.status == FindingStatus.RESOLVED

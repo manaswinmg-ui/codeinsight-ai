@@ -6,8 +6,8 @@ logger = logging.getLogger("app.ai.cost_logger")
 class CostLogger:
     # Cost per token in USD
     PRICING = {
-        "gpt-5.4-mini": {"input": 0.15 / 1_000_000, "output": 0.60 / 1_000_000},
-        "gpt-5.5": {"input": 2.50 / 1_000_000, "output": 10.00 / 1_000_000},
+        "gpt-4o-mini": {"input": 0.15 / 1_000_000, "output": 0.60 / 1_000_000},
+        "gpt-4o": {"input": 2.50 / 1_000_000, "output": 10.00 / 1_000_000},
         "text-embedding-3-small": {"input": 0.02 / 1_000_000, "output": 0.0},
     }
 
@@ -19,7 +19,7 @@ class CostLogger:
         model_pricing = cls.PRICING.get(model.lower().strip())
         if not model_pricing:
             # Fallback default pricing if model not matching
-            model_pricing = cls.PRICING["gpt-5.4-mini"]
+            model_pricing = cls.PRICING["gpt-4o-mini"]
 
         cost = (input_tokens * model_pricing["input"]) + (
             output_tokens * model_pricing["output"]

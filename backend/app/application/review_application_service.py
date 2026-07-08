@@ -149,12 +149,21 @@ class ReviewApplicationService:
             for ticket_id, finding_id in result.all():
                 ticket_map[finding_id] = ticket_id
 
-        # ── Quality score: severity-weighted deduction ──────────────────────
-        _deductions = {"critical": 20, "high": 15, "medium": 10, "low": 5, "info": 2}
-        score = 100
-        for f in findings:
-            score -= _deductions.get(f.severity.lower(), 5)
-        score = max(0, score)
+        # ── Quality score ───────────────────────────────────────────────────
+        if review.quality_score is not None:
+            score = review.quality_score
+        else:
+            _deductions = {
+                "critical": 20,
+                "high": 15,
+                "medium": 10,
+                "low": 5,
+                "info": 2,
+            }
+            score = 100
+            for f in findings:
+                score -= _deductions.get(f.severity.lower(), 5)
+            score = max(0, score)
 
         # ── Textual summary: derived from review status ─────────────────────
         status_name = (
