@@ -348,6 +348,7 @@ erDiagram
         text code
         string language
         string status
+        int quality_score
         int user_id FK
     }
 
@@ -587,6 +588,21 @@ The interactive workspace provides developers with side-by-side comparisons of c
 
 ![CodeInsight AI Review Workspace showing code and findings side-by-side](images/review_workspace_page.png)
 
+### 15.2 Quality Score Calculation & Clean Code Optimization
+
+#### Quality Score Storage & Caching
+To optimize database query performance, the calculated `quality_score` is persisted directly to the `Review` model once it transitions to `COMPLETED`. An Alembic migration registers the `quality_score` database column. Query repositories execute aggregations and summaries (e.g., dashboard metrics) directly at the database level rather than performing memory-intensive Python-side calculations.
+
+#### Clean Code Prompts & False-Positive Prevention
+To prevent the LLM from generating false-positive placeholder findings on clean code files, the prompt builder has been enhanced to instruct the model to return an empty list `[]` and a quality score of 100 if the code contains no security vulnerabilities, bugs, or major maintainability concerns.
+
+Additionally, the cognitive merger cleanses and filters out any placeholder reports matching clean patterns (e.g., "no errors", "eslint passed", "ruff passed") in both the finding's title and description.
+
+#### Static Analyzer Severity Mapping
+To keep the dashboard actionable, stylistic static analysis warnings are downranked:
+* **ESLint**: Disabled rules (`severity: 0`) are ignored. Style and warning rules (spacing, trailing whitespace, unused variables, semi-colons, unused imports) are downranked to `low` or `info` severity levels and categorized under `READABILITY` or `BEST_PRACTICE`.
+* **Ruff**: Warning prefix rules (formatting `E`/`W` pycodestyle, `I` isort, `N` pep8-naming, `D` pydocstyle docstrings, `UP` pyupgrade) are mapped to `low` or `info` severities and appropriate non-critical categories (`READABILITY`, `BEST_PRACTICE`, `DOCUMENTATION`).
+
 ---
 
 ## Chapter 16: API Design & DTO Specifications
@@ -616,6 +632,21 @@ sequenceDiagram
     end
 ```
 
+### 16.1 Rich Ticket Generation & Lifecycle Synchronization
+
+#### Rich Ticket Description Generation
+When creating a bug ticket from an AI finding, `TicketService` compiles all available finding metadata into a structured, developer-focused Markdown body for the ticket's description. This incorporates:
+* An explanatory summary and the impact of the issue.
+* Structural categorization, severity level, confidence score, and estimated fix time.
+* Concrete suggested fixes alongside language-specific, syntax-highlighted code blocks showing the improved implementation.
+* Testing hints and references.
+
+#### Bidirectional Status Synchronization
+To prevent disconnects between findings and trackable tickets, an automatic synchronization lifecycle has been implemented:
+* Opening or moving a ticket back to `OPEN`/`TODO` sets the linked finding's status back to `OPEN`.
+* Transitioning a ticket to `IN_PROGRESS` or `IN_REVIEW` marks the finding as `ACKNOWLEDGED`.
+* Closing or completing a ticket (`DONE`/`CLOSED`) automatically marks the finding as `RESOLVED`.
+
 ---
 
 ## Chapter 17: Frontend Architecture & UI Hierarchy
@@ -636,6 +667,9 @@ graph TD
     Workspace --> Editor[CodeViewer / Editor Component]
     Workspace --> FindingsList[FindingsPanel / Chat Component]
 ```
+
+### 17.1 UI Severity Distribution Integration
+To enhance the developer's visual workspace, the `SeverityChart` component is integrated directly into the `ReviewSummaryCard` layout. When a code review is loaded, it computes the finding counts across all severities and displays a modern, stacked horizontal bar chart highlighting the code's risk distribution. This provides engineering leads with immediate visual cues for prioritization.
 
 ---
 
